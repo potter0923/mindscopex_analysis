@@ -333,6 +333,66 @@ def bootstrap_delta_ci(
     return point, low, high
 
 
+def bootstrap_mean_delta_ci(
+    jacobian_margins: Mapping[int, Mapping[str, float]],
+    logit_margins: Mapping[int, Mapping[str, float]],
+    final_margins: Mapping[str, float],
+    *,
+    draws: int = 2000,
+    seed: int = 0,
+    alpha: float = 0.05,
+) -> tuple[float, float, float, list[int]]:
+    """CI for the J-lens advantage *averaged over layers*, not picked at the best one.
+
+    Testing at the layer that happened to score highest is the winner's curse the
+    2026-08-23 post-mortem ran into: with sixteen layers on the table, the best of
+    them looks good by chance alone. Averaging over a layer set fixed in advance
+    gives one number with no selection in it, so it is the headline; per-layer
+    intervals stay descriptive.
+
+    Returns:
+        ``(point_estimate, low, high, layers_used)``.
+
+    Raises:
+        ValueError: If no layer is shared, or fewer than two cases are.
+    """
+    layers = sorted(set(jacobian_margins) & set(logit_margins))
+    if not layers:
+        raise ValueError("the two lenses share no layer")
+    shared = sorted(
+        set.intersection(
+            *(set(jacobian_margins[layer]) for layer in layers),
+            *(set(logit_margins[layer]) for layer in layers),
+            set(final_margins),
+        )
+    )
+    if len(shared) < 2:
+        raise ValueError("need at least two cases present at every layer")
+
+    def _mean_delta(case_ids: Sequence[str]) -> float:
+        finals = [final_margins[c] for c in case_ids]
+        total = 0.0
+        for layer in layers:
+            total += spearman([jacobian_margins[layer][c] for c in case_ids], finals)
+            total -= spearman([logit_margins[layer][c] for c in case_ids], finals)
+        return total / len(layers)
+
+    point = _mean_delta(shared)
+    rng = random.Random(seed)
+    samples = []
+    for _ in range(draws):
+        resampled = [rng.choice(shared) for _ in shared]
+        if len({final_margins[c] for c in resampled}) < 2:
+            continue
+        samples.append(_mean_delta(resampled))
+    if not samples:
+        return point, float("nan"), float("nan"), layers
+    samples.sort()
+    low = samples[int(alpha / 2 * (len(samples) - 1))]
+    high = samples[int((1 - alpha / 2) * (len(samples) - 1))]
+    return point, low, high, layers
+
+
 def first_token_id(tokenizer: Any, answer: str) -> int:
     """Token id of the first token of ``answer``.
 
@@ -637,6 +697,7 @@ __all__ = [
     "answers_are_separable",
     "as_tokenizer",
     "bootstrap_delta_ci",
+    "bootstrap_mean_delta_ci",
     "case_trajectory",
     "comparison_rows",
     "condition_trajectories",

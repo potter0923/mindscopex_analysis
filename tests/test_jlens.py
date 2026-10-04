@@ -10,6 +10,7 @@ from mindscopex_analysis.jlens import (
     answer_margin,
     answers_are_separable,
     bootstrap_delta_ci,
+    bootstrap_mean_delta_ci,
     comparison_rows,
     divergence_layer,
     first_token_id,
@@ -320,6 +321,60 @@ class BootstrapDeltaTests(unittest.TestCase):
     def test_too_few_shared_cases_raises(self) -> None:
         with self.assertRaises(ValueError):
             bootstrap_delta_ci({"a": 1.0}, {"a": 1.0}, {"a": 1.0})
+
+
+class BootstrapMeanDeltaTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.ids = [f"c{i}" for i in range(12)]
+        self.final = {c: float(i) for i, c in enumerate(self.ids)}
+        self.tracking = dict(self.final)
+        self.reversed = {c: -float(i) for i, c in enumerate(self.ids)}
+
+    def test_averages_over_every_shared_layer(self) -> None:
+        # One layer where J wins by 2.0, one where the two tie: mean is 1.0.
+        jacobian = {0: self.tracking, 4: self.tracking}
+        logit = {0: self.reversed, 4: self.tracking}
+        point, low, high, layers = bootstrap_mean_delta_ci(
+            jacobian, logit, self.final, draws=400
+        )
+        self.assertEqual(layers, [0, 4])
+        self.assertAlmostEqual(point, 1.0)
+        self.assertGreater(low, 0.0)
+        self.assertGreaterEqual(high, low)
+
+    def test_a_single_strong_layer_does_not_decide_the_average(self) -> None:
+        # Three ties and one win average to 0.5, well under the winning layer's 2.0.
+        jacobian = {n: self.tracking for n in (0, 2, 4, 6)}
+        logit = {0: self.reversed, 2: self.tracking, 4: self.tracking, 6: self.tracking}
+        point, _low, _high, _layers = bootstrap_mean_delta_ci(
+            jacobian, logit, self.final, draws=200
+        )
+        self.assertAlmostEqual(point, 0.5)
+
+    def test_tie_everywhere_contains_zero(self) -> None:
+        layers = {n: self.tracking for n in (0, 2)}
+        point, low, high, _ = bootstrap_mean_delta_ci(
+            layers, layers, self.final, draws=400
+        )
+        self.assertAlmostEqual(point, 0.0)
+        self.assertLessEqual(low, 0.0)
+        self.assertGreaterEqual(high, 0.0)
+
+    def test_only_layers_present_in_both_are_used(self) -> None:
+        jacobian = {0: self.tracking, 9: self.tracking}
+        logit = {0: self.tracking}
+        _point, _low, _high, layers = bootstrap_mean_delta_ci(
+            jacobian, logit, self.final, draws=100
+        )
+        self.assertEqual(layers, [0])
+
+    def test_no_shared_layer_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            bootstrap_mean_delta_ci({0: self.tracking}, {1: self.tracking}, self.final)
+
+    def test_too_few_shared_cases_raises(self) -> None:
+        with self.assertRaises(ValueError):
+            bootstrap_mean_delta_ci({0: {"a": 1.0}}, {0: {"a": 1.0}}, {"a": 1.0})
 
 
 class DefaultsTests(unittest.TestCase):

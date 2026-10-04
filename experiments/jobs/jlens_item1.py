@@ -173,6 +173,23 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
 
     scored = [row for row in rows if row["delta"] is not None]
     best = max(scored, key=lambda row: row["jacobian"]) if scored else None
+
+    # Headline: averaged over the whole pre-set layer list, so no layer is picked
+    # after looking. Per-layer intervals below are descriptive only.
+    mean_point, mean_low, mean_high, used = jlens.bootstrap_mean_delta_ci(
+        readouts["jacobian"]["margins"],
+        readouts["logit"]["margins"],
+        readouts["jacobian"]["finals"],
+        draws=args.bootstrap_draws,
+        seed=args.seed,
+    )
+    overall = {
+        "delta": mean_point,
+        "low": mean_low,
+        "high": mean_high,
+        "layers": used,
+    }
+
     interval = None
     if best is not None:
         point, low, high = jlens.bootstrap_delta_ci(
@@ -199,6 +216,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "eval_case_ids": [case.case_id for case in plan["eval_cases"]],
         "skipped_case_ids": readouts["jacobian"]["skipped"],
         "correlations": rows,
+        "overall_delta_ci": overall,
         "best_layer": best,
         "delta_ci": interval,
         "elapsed_seconds": round(time.time() - started, 1),
@@ -211,12 +229,17 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             f"{row['layer']:5d}"
             f"{_fmt(row['jacobian'])}{_fmt(row['logit'])}{_fmt(row['delta'])}"
         )
+    verdict = "J-lens ahead" if overall["low"] > 0 else "not separable from zero"
+    print(
+        f"\nmean over {len(overall['layers'])} layers: "
+        f"delta {overall['delta']:+.3f} "
+        f"[{overall['low']:+.3f}, {overall['high']:+.3f}]  -> {verdict}"
+    )
     if interval is not None:
-        verdict = "J-lens ahead" if interval["low"] > 0 else "not separable from zero"
         print(
-            f"\nbest layer {interval['layer']}: "
+            f"(descriptive) best J-lens layer {interval['layer']}: "
             f"delta {interval['delta']:+.3f} "
-            f"[{interval['low']:+.3f}, {interval['high']:+.3f}]  -> {verdict}"
+            f"[{interval['low']:+.3f}, {interval['high']:+.3f}]"
         )
     print(f"\nwritten to {run_dir / 'result.json'}")
     return result
