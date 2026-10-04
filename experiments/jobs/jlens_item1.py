@@ -127,7 +127,8 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     lens_path = Path(args.lens_path) if args.lens_path else run_dir / "lens.pt"
 
     started = time.time()
-    hf_model, tokenizer = load_qwen_text_generation_model(plan["model_id"])
+    hf_model, loaded = load_qwen_text_generation_model(plan["model_id"])
+    tokenizer = jlens.as_tokenizer(loaded)  # Qwen3.5 arrives as an AutoProcessor
     model = jlens.wrap_model(hf_model, tokenizer)
     print(f"[{time.time() - started:6.0f}s] model loaded", flush=True)
 

@@ -340,10 +340,21 @@ def first_token_id(tokenizer: Any, answer: str) -> int:
     through its first token. Callers comparing two answers should check that the
     two first tokens differ, or the trajectory is meaningless.
     """
-    ids = tokenizer.encode(answer, add_special_tokens=False)
+    ids = as_tokenizer(tokenizer).encode(answer, add_special_tokens=False)
     if not ids:
         raise ValueError(f"answer {answer!r} produced no tokens")
     return int(ids[0])
+
+
+def as_tokenizer(tokenizer: Any) -> Any:
+    """Unwrap a processor to the text tokenizer inside it.
+
+    Qwen3.5 loads through ``AutoProcessor`` (it is a multimodal checkpoint), and
+    the processor has no ``encode``/``decode`` of its own — the text tokenizer is
+    one attribute in. Passing a plain tokenizer through is a no-op, so callers can
+    apply this unconditionally.
+    """
+    return getattr(tokenizer, "tokenizer", tokenizer)
 
 
 @dataclass(frozen=True)
@@ -374,6 +385,7 @@ def answer_contrast(tokenizer: Any, case: LureCase) -> AnswerContrast:
         ValueError: If one answer's tokens are a prefix of the other's, so no
             position distinguishes them and the case carries no lens signal.
     """
+    tokenizer = as_tokenizer(tokenizer)
     correct = tokenizer.encode(case.correct_answer, add_special_tokens=False)
     lure = tokenizer.encode(case.lure_answer, add_special_tokens=False)
     if not correct or not lure:
@@ -412,7 +424,7 @@ def wrap_model(hf_model: Any, tokenizer: Any, **kwargs: Any) -> Any:
     ``tokenizer.add_bos_token = True``), so do not share the object with other
     experiments.
     """
-    return _require_jlens().from_hf(hf_model, tokenizer, **kwargs)
+    return _require_jlens().from_hf(hf_model, as_tokenizer(tokenizer), **kwargs)
 
 
 def load_or_fit_lens(
@@ -623,6 +635,7 @@ __all__ = [
     "answer_contrast",
     "answer_margin",
     "answers_are_separable",
+    "as_tokenizer",
     "bootstrap_delta_ci",
     "case_trajectory",
     "comparison_rows",
