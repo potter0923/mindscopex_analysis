@@ -87,7 +87,12 @@ def build_plan(args: argparse.Namespace) -> dict[str, Any]:
     profile = get_qwen35_analysis_profile(args.profile)
     cases = load_lure_dataset(args.dataset)
     fit_cases, eval_cases = jlens.split_fit_eval(cases, n_fit=args.n_fit, seed=args.seed)
-    layers = list(range(0, profile.num_layers - 1, args.layer_stride))
+    # The lens transports *into* the target layer, so every source layer must sit
+    # strictly below it. DEFAULT_TARGET_LAYER is -2 (the paper's penultimate).
+    target_index = jlens.DEFAULT_TARGET_LAYER
+    if target_index < 0:
+        target_index += profile.num_layers
+    layers = list(range(0, target_index, args.layer_stride))
     backwards = -(-profile.hidden_size // args.dim_batch)
     return {
         "profile": profile,
@@ -97,6 +102,7 @@ def build_plan(args: argparse.Namespace) -> dict[str, Any]:
         "fit_cases": fit_cases,
         "eval_cases": eval_cases,
         "layers": layers,
+        "target_index": target_index,
         "backwards_per_prompt": backwards,
         "total_backwards": backwards * len(fit_cases),
     }
@@ -109,7 +115,7 @@ def describe(plan: dict[str, Any]) -> str:
             f"model        {plan['model_id']}  ({profile.num_layers} layers, d={profile.hidden_size})",
             f"dataset      {plan['dataset']}  n={plan['n_cases']}",
             f"split        fit {len(plan['fit_cases'])} / eval {len(plan['eval_cases'])}",
-            f"layers       {plan['layers']}",
+            f"layers       {plan['layers']}  (target {plan['target_index']})",
             f"fit cost     {plan['backwards_per_prompt']} backwards/prompt"
             f"  ->  {plan['total_backwards']:,} total",
         ]
