@@ -575,29 +575,42 @@ def margin_scan(
     cases: Sequence[LureCase],
     *,
     layers: Sequence[int] | None = None,
-    position: int = -1,
+    positions: Sequence[int] = (-1,),
     use_jacobian: bool = True,
     skip_inseparable: bool = True,
-) -> tuple[dict[int, dict[str, float]], dict[str, float], list[str]]:
+) -> tuple[dict[int, dict[int, dict[str, float]]], dict[str, float], list[str]]:
     """Lens margins per layer plus the model's own final margin, over a case set.
 
     This is the measurement half of the 2026-10-03 plan's first item: read the
     held-out cases at every scanned layer, and separately record what the model
     actually ended up preferring, so the two can be correlated.
 
+    Several positions cost nothing extra: one ``apply`` call reads them all from
+    the same forward pass. ``-1`` is the answer slot; more negative values step
+    back into the question, which is how the 2026-10-03 plan's "token signal" half
+    gets answered (does the model commit to the lure while still *reading*, or only
+    when about to answer?).
+
     Args:
         layers: Layers to read. ``None`` reads every layer the lens holds.
-        position: Token position to read; ``-1`` is the answer slot.
+        positions: Token positions to read, counted from the end of the prompt.
         use_jacobian: ``False`` gives the plain logit-lens baseline.
-        skip_inseparable: Drop cases whose two answers share a first token. The
-            lens reads one token, so those cases carry no signal either way and
-            would only add noise to the correlation.
+        skip_inseparable: Drop cases whose answers no position tells apart. Those
+            carry no signal either way and would only add noise.
 
     Returns:
         ``(lens_margins, final_margins, skipped_case_ids)`` where ``lens_margins``
-        is ``{layer: {case_id: margin}}``.
+        is ``{position: {layer: {case_id: margin}}}``. ``final_margins`` comes from
+        the model's own logits at the answer slot and does not vary by position.
     """
-    lens_margins: dict[int, dict[str, float]] = {}
+    wanted = list(positions)
+    if not wanted:
+        raise ValueError("positions must not be empty")
+    if -1 not in wanted:
+        raise ValueError("positions must include -1, the answer slot the model is scored at")
+    answer_slot = wanted.index(-1)
+
+    lens_margins: dict[int, dict[int, dict[str, float]]] = {}
     final_margins: dict[str, float] = {}
     skipped: list[str] = []
     for case in cases:
@@ -612,15 +625,22 @@ def margin_scan(
             model,
             case.prompt + contrast.prefix,
             layers=None if layers is None else list(layers),
-            positions=[position],
+            positions=wanted,
             use_jacobian=use_jacobian,
         )
         for layer, logits in lens_logits.items():
-            lens_margins.setdefault(int(layer), {})[case.case_id] = answer_margin(
-                logits[0].tolist(), contrast.lure_token_id, contrast.correct_token_id
-            )
+            for offset, position in enumerate(wanted):
+                lens_margins.setdefault(position, {}).setdefault(int(layer), {})[
+                    case.case_id
+                ] = answer_margin(
+                    logits[offset].tolist(),
+                    contrast.lure_token_id,
+                    contrast.correct_token_id,
+                )
         final_margins[case.case_id] = answer_margin(
-            model_logits[0].tolist(), contrast.lure_token_id, contrast.correct_token_id
+            model_logits[answer_slot].tolist(),
+            contrast.lure_token_id,
+            contrast.correct_token_id,
         )
     return lens_margins, final_margins, skipped
 

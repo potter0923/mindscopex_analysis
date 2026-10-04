@@ -75,6 +75,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--lens-path", default=None, help="Defaults to the run directory.")
     parser.add_argument("--bootstrap-draws", type=int, default=2000)
     parser.add_argument(
+        "--positions",
+        default="-1,-2,-4,-8,-16",
+        help=(
+            "Token positions to read, from the end of the prompt. Must include -1. "
+            "They come from one forward pass, so extra positions are nearly free."
+        ),
+    )
+    parser.add_argument(
         "--dry-run",
         action="store_true",
         help="Print the plan and the split, load no model.",
@@ -85,6 +93,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def build_plan(args: argparse.Namespace) -> dict[str, Any]:
     """Resolve everything that does not need a GPU, so --dry-run can show it."""
     profile = get_qwen35_analysis_profile(args.profile)
+    positions = [int(value) for value in args.positions.split(",") if value.strip()]
+    if -1 not in positions:
+        raise ValueError(f"--positions must include -1; got {positions}")
     cases = load_lure_dataset(args.dataset)
     fit_cases, eval_cases = jlens.split_fit_eval(cases, n_fit=args.n_fit, seed=args.seed)
     # The lens transports *into* the target layer, so every source layer must sit
@@ -102,6 +113,7 @@ def build_plan(args: argparse.Namespace) -> dict[str, Any]:
         "fit_cases": fit_cases,
         "eval_cases": eval_cases,
         "layers": layers,
+        "positions": positions,
         "target_index": target_index,
         "backwards_per_prompt": backwards,
         "total_backwards": backwards * len(fit_cases),
@@ -116,6 +128,7 @@ def describe(plan: dict[str, Any]) -> str:
             f"dataset      {plan['dataset']}  n={plan['n_cases']}",
             f"split        fit {len(plan['fit_cases'])} / eval {len(plan['eval_cases'])}",
             f"layers       {plan['layers']}  (target {plan['target_index']})",
+            f"positions    {plan['positions']}  (-1 = answer slot)",
             f"fit cost     {plan['backwards_per_prompt']} backwards/prompt"
             f"  ->  {plan['total_backwards']:,} total",
         ]
@@ -156,6 +169,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             tokenizer,
             plan["eval_cases"],
             layers=plan["layers"],
+            positions=plan["positions"],
             use_jacobian=use_jacobian,
         )
         readouts[name] = {"margins": margins, "finals": finals, "skipped": skipped}
@@ -165,37 +179,41 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             flush=True,
         )
 
-    correlations = {
-        name: jlens.layer_correlations(data["margins"], data["finals"])
-        for name, data in readouts.items()
-    }
-    rows = jlens.comparison_rows(correlations["jacobian"], correlations["logit"])
+    finals = readouts["jacobian"]["finals"]
+    by_position: dict[int, dict[str, Any]] = {}
+    for position in plan["positions"]:
+        jacobian_at = readouts["jacobian"]["margins"][position]
+        logit_at = readouts["logit"]["margins"][position]
+        rows_at = jlens.comparison_rows(
+            jlens.layer_correlations(jacobian_at, finals),
+            jlens.layer_correlations(logit_at, finals),
+        )
+        # Headline per position: averaged over the whole pre-set layer list, so no
+        # layer is picked after looking. Per-layer numbers stay descriptive.
+        point, low, high, used = jlens.bootstrap_mean_delta_ci(
+            jacobian_at, logit_at, finals, draws=args.bootstrap_draws, seed=args.seed
+        )
+        by_position[position] = {
+            "correlations": rows_at,
+            "mean_delta": {"delta": point, "low": low, "high": high, "layers": used},
+            "best_jacobian_layer": max(
+                (row for row in rows_at if row["jacobian"] is not None),
+                key=lambda row: row["jacobian"],
+                default=None,
+            ),
+        }
 
-    scored = [row for row in rows if row["delta"] is not None]
-    best = max(scored, key=lambda row: row["jacobian"]) if scored else None
-
-    # Headline: averaged over the whole pre-set layer list, so no layer is picked
-    # after looking. Per-layer intervals below are descriptive only.
-    mean_point, mean_low, mean_high, used = jlens.bootstrap_mean_delta_ci(
-        readouts["jacobian"]["margins"],
-        readouts["logit"]["margins"],
-        readouts["jacobian"]["finals"],
-        draws=args.bootstrap_draws,
-        seed=args.seed,
-    )
-    overall = {
-        "delta": mean_point,
-        "low": mean_low,
-        "high": mean_high,
-        "layers": used,
-    }
+    answer_slot = by_position[-1]
+    rows = answer_slot["correlations"]
+    overall = answer_slot["mean_delta"]
+    best = answer_slot["best_jacobian_layer"]
 
     interval = None
     if best is not None:
         point, low, high = jlens.bootstrap_delta_ci(
-            readouts["jacobian"]["margins"][best["layer"]],
-            readouts["logit"]["margins"][best["layer"]],
-            readouts["jacobian"]["finals"],
+            readouts["jacobian"]["margins"][-1][best["layer"]],
+            readouts["logit"]["margins"][-1][best["layer"]],
+            finals,
             draws=args.bootstrap_draws,
             seed=args.seed,
         )
@@ -210,6 +228,7 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             "n_eval": len(plan["eval_cases"]),
             "seed": args.seed,
             "layers": plan["layers"],
+            "positions": plan["positions"],
             "dim_batch": args.dim_batch,
             "target_layer": jlens.DEFAULT_TARGET_LAYER,
         },
@@ -219,11 +238,13 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
         "overall_delta_ci": overall,
         "best_layer": best,
         "delta_ci": interval,
+        "by_position": {str(k): v for k, v in by_position.items()},
         "elapsed_seconds": round(time.time() - started, 1),
     }
     (run_dir / "result.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
 
-    print("\nlayer   J-lens   logit    delta")
+    print("\n== answer slot (position -1) ==")
+    print("layer   J-lens   logit    delta")
     for row in rows:
         print(
             f"{row['layer']:5d}"
@@ -240,6 +261,19 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             f"(descriptive) best J-lens layer {interval['layer']}: "
             f"delta {interval['delta']:+.3f} "
             f"[{interval['low']:+.3f}, {interval['high']:+.3f}]"
+        )
+
+    # The token half of item 1: how far back from the answer the signal survives.
+    print("\n== across token positions ==")
+    print("  pos   best J-lens  (layer)   mean delta        CI")
+    for position in plan["positions"]:
+        entry = by_position[position]
+        top, mean = entry["best_jacobian_layer"], entry["mean_delta"]
+        peak = "       -" if top is None else f"{top['jacobian']:+8.3f}"
+        where = "    -" if top is None else f"{top['layer']:5d}"
+        print(
+            f"{position:5d}{peak}  {where}   {mean['delta']:+8.3f}"
+            f"   [{mean['low']:+.3f}, {mean['high']:+.3f}]"
         )
     print(f"\nwritten to {run_dir / 'result.json'}")
     return result
