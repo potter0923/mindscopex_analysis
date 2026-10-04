@@ -55,6 +55,7 @@ Caveats the paper states and that callers must respect:
 from __future__ import annotations
 
 import os
+import random
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
@@ -171,6 +172,167 @@ def trajectory_rows(
     return rows
 
 
+def split_fit_eval(
+    cases: Sequence[LureCase],
+    *,
+    n_fit: int,
+    seed: int = 0,
+) -> tuple[list[LureCase], list[LureCase]]:
+    """Deterministic fit/eval split over a case list.
+
+    The lens must not be fitted on the prompts it is then scored against, so the
+    2026-10-03 plan splits ``hagendorff_crt`` 105/45. The shuffle is seeded and
+    uses only the stdlib, so the same seed reproduces the same split anywhere.
+
+    Raises:
+        ValueError: If ``n_fit`` leaves no evaluation cases.
+    """
+    if not 0 < n_fit < len(cases):
+        raise ValueError(f"n_fit={n_fit} must be between 1 and {len(cases) - 1}")
+    order = list(cases)
+    random.Random(seed).shuffle(order)
+    return order[:n_fit], order[n_fit:]
+
+
+def answer_margin(scores: Sequence[float], lure_token_id: int, correct_token_id: int) -> float:
+    """``score[lure] - score[correct]``; positive means the lure is favoured.
+
+    Ranks say *where* a token sits; the margin says *by how much*, which is what
+    the lens-versus-lens correlation needs.
+    """
+    for token_id in (lure_token_id, correct_token_id):
+        if not 0 <= token_id < len(scores):
+            raise IndexError(f"token_id={token_id} out of range for {len(scores)} scores")
+    return float(scores[lure_token_id]) - float(scores[correct_token_id])
+
+
+def _average_ranks(values: Sequence[float]) -> list[float]:
+    """Ranks of ``values``, ties sharing the mean of the ranks they span."""
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    ranks = [0.0] * len(values)
+    start = 0
+    while start < len(order):
+        stop = start
+        while stop + 1 < len(order) and values[order[stop + 1]] == values[order[start]]:
+            stop += 1
+        shared = (start + stop) / 2 + 1
+        for position in range(start, stop + 1):
+            ranks[order[position]] = shared
+        start = stop + 1
+    return ranks
+
+
+def spearman(xs: Sequence[float], ys: Sequence[float]) -> float:
+    """Spearman rank correlation, stdlib only, ties averaged.
+
+    Returns ``0.0`` when either side is constant, since no monotone relation is
+    measurable there. Kept dependency-free so it is testable without torch.
+
+    Raises:
+        ValueError: If the inputs differ in length or have fewer than two points.
+    """
+    if len(xs) != len(ys):
+        raise ValueError(f"length mismatch: {len(xs)} vs {len(ys)}")
+    if len(xs) < 2:
+        raise ValueError("need at least two points")
+    rx, ry = _average_ranks(xs), _average_ranks(ys)
+    mx, my = sum(rx) / len(rx), sum(ry) / len(ry)
+    dx = [value - mx for value in rx]
+    dy = [value - my for value in ry]
+    denominator = (sum(v * v for v in dx) * sum(v * v for v in dy)) ** 0.5
+    if denominator == 0:
+        return 0.0
+    return sum(a * b for a, b in zip(dx, dy, strict=True)) / denominator
+
+
+def layer_correlations(
+    lens_margins: Mapping[int, Mapping[str, float]],
+    final_margins: Mapping[str, float],
+) -> dict[int, float]:
+    """Per-layer Spearman between the lens margin and the model's final margin.
+
+    This is the number the 2026-10-02 note reports (0.35 for the J-lens against
+    0.10 for the logit lens, on 2B). A layer scoring high means the lens readout
+    there already tracks which answer the model ends up preferring.
+    """
+    out: dict[int, float] = {}
+    for layer in sorted(lens_margins):
+        shared = [case_id for case_id in lens_margins[layer] if case_id in final_margins]
+        if len(shared) < 2:
+            continue
+        out[int(layer)] = spearman(
+            [lens_margins[layer][case_id] for case_id in shared],
+            [final_margins[case_id] for case_id in shared],
+        )
+    return out
+
+
+def comparison_rows(
+    jacobian: Mapping[int, float],
+    logit: Mapping[int, float],
+) -> list[dict[str, Any]]:
+    """Side-by-side per-layer correlations, J-lens minus logit lens."""
+    rows: list[dict[str, Any]] = []
+    for layer in sorted(set(jacobian) | set(logit)):
+        j_value, l_value = jacobian.get(layer), logit.get(layer)
+        rows.append(
+            {
+                "layer": layer,
+                "jacobian": j_value,
+                "logit": l_value,
+                "delta": None if j_value is None or l_value is None else j_value - l_value,
+            }
+        )
+    return rows
+
+
+def bootstrap_delta_ci(
+    jacobian_margins: Mapping[str, float],
+    logit_margins: Mapping[str, float],
+    final_margins: Mapping[str, float],
+    *,
+    draws: int = 2000,
+    seed: int = 0,
+    alpha: float = 0.05,
+) -> tuple[float, float, float]:
+    """Case-resampled CI for ``spearman(J) - spearman(logit)`` at one layer.
+
+    The 2026-10-02 result could not be called a win because the interval around
+    the difference contained zero. Resampling *cases* (not layers) keeps the two
+    lenses paired on the same draw, which is what makes the difference testable.
+
+    Returns:
+        ``(point_estimate, low, high)``.
+
+    Raises:
+        ValueError: If fewer than two cases are shared by all three maps.
+    """
+    shared = sorted(set(jacobian_margins) & set(logit_margins) & set(final_margins))
+    if len(shared) < 2:
+        raise ValueError("need at least two cases present in all three maps")
+
+    def _delta(case_ids: Sequence[str]) -> float:
+        finals = [final_margins[c] for c in case_ids]
+        return spearman([jacobian_margins[c] for c in case_ids], finals) - spearman(
+            [logit_margins[c] for c in case_ids], finals
+        )
+
+    point = _delta(shared)
+    rng = random.Random(seed)
+    samples = []
+    for _ in range(draws):
+        resampled = [rng.choice(shared) for _ in shared]
+        if len({final_margins[c] for c in resampled}) < 2:
+            continue
+        samples.append(_delta(resampled))
+    if not samples:
+        return point, float("nan"), float("nan")
+    samples.sort()
+    low = samples[int(alpha / 2 * (len(samples) - 1))]
+    high = samples[int((1 - alpha / 2) * (len(samples) - 1))]
+    return point, low, high
+
+
 def first_token_id(tokenizer: Any, answer: str) -> int:
     """Token id of the first token of ``answer``.
 
@@ -184,11 +346,59 @@ def first_token_id(tokenizer: Any, answer: str) -> int:
     return int(ids[0])
 
 
-def answers_are_separable(tokenizer: Any, case: LureCase) -> bool:
-    """Whether correct and lure answers differ in their first token."""
-    return first_token_id(tokenizer, case.correct_answer) != first_token_id(
-        tokenizer, case.lure_answer
+@dataclass(frozen=True)
+class AnswerContrast:
+    """Where two answers first part company, and what to read there.
+
+    The lens scores one token at one position, so a pair like ``" $20.0"`` and
+    ``" $40.0"`` cannot be told apart at the answer slot: both open with ``" $"``.
+    They differ at the *next* token. Appending the shared opening to the prompt
+    (teacher forcing) moves the read to the position where the two answers
+    actually diverge, which is where the choice is visible.
+    """
+
+    prefix: str
+    prefix_tokens: int
+    lure_token_id: int
+    correct_token_id: int
+
+    @property
+    def needs_prefix(self) -> bool:
+        return self.prefix_tokens > 0
+
+
+def answer_contrast(tokenizer: Any, case: LureCase) -> AnswerContrast:
+    """First token position at which the two answers differ.
+
+    Raises:
+        ValueError: If one answer's tokens are a prefix of the other's, so no
+            position distinguishes them and the case carries no lens signal.
+    """
+    correct = tokenizer.encode(case.correct_answer, add_special_tokens=False)
+    lure = tokenizer.encode(case.lure_answer, add_special_tokens=False)
+    if not correct or not lure:
+        raise ValueError(f"case {case.case_id!r} has an answer that produced no tokens")
+    for index in range(min(len(correct), len(lure))):
+        if correct[index] != lure[index]:
+            return AnswerContrast(
+                prefix=tokenizer.decode(correct[:index]) if index else "",
+                prefix_tokens=index,
+                lure_token_id=int(lure[index]),
+                correct_token_id=int(correct[index]),
+            )
+    raise ValueError(
+        f"case {case.case_id!r}: one answer is a token-prefix of the other "
+        f"({case.correct_answer!r} vs {case.lure_answer!r}); no position separates them"
     )
+
+
+def answers_are_separable(tokenizer: Any, case: LureCase) -> bool:
+    """Whether some token position tells the two answers apart."""
+    try:
+        answer_contrast(tokenizer, case)
+    except ValueError:
+        return False
+    return True
 
 
 # ------------------------------------------------------------ model-dependent
@@ -264,11 +474,11 @@ def case_trajectory(
     ``use_jacobian=False`` reproduces the plain logit-lens baseline, which is the
     comparison the paper reports against.
     """
-    lure_id = first_token_id(tokenizer, case.lure_answer)
-    correct_id = first_token_id(tokenizer, case.correct_answer)
+    contrast = answer_contrast(tokenizer, case)
+    lure_id, correct_id = contrast.lure_token_id, contrast.correct_token_id
     lens_logits, _model_logits, _ids = lens.apply(
         model,
-        case.prompt,
+        case.prompt + contrast.prefix,
         layers=None if layers is None else list(layers),
         positions=[position],
         use_jacobian=use_jacobian,
@@ -284,6 +494,63 @@ def case_trajectory(
             correct_rank=token_rank(scores, correct_id),
         )
     return out
+
+
+def margin_scan(
+    lens: Any,
+    model: Any,
+    tokenizer: Any,
+    cases: Sequence[LureCase],
+    *,
+    layers: Sequence[int] | None = None,
+    position: int = -1,
+    use_jacobian: bool = True,
+    skip_inseparable: bool = True,
+) -> tuple[dict[int, dict[str, float]], dict[str, float], list[str]]:
+    """Lens margins per layer plus the model's own final margin, over a case set.
+
+    This is the measurement half of the 2026-10-03 plan's first item: read the
+    held-out cases at every scanned layer, and separately record what the model
+    actually ended up preferring, so the two can be correlated.
+
+    Args:
+        layers: Layers to read. ``None`` reads every layer the lens holds.
+        position: Token position to read; ``-1`` is the answer slot.
+        use_jacobian: ``False`` gives the plain logit-lens baseline.
+        skip_inseparable: Drop cases whose two answers share a first token. The
+            lens reads one token, so those cases carry no signal either way and
+            would only add noise to the correlation.
+
+    Returns:
+        ``(lens_margins, final_margins, skipped_case_ids)`` where ``lens_margins``
+        is ``{layer: {case_id: margin}}``.
+    """
+    lens_margins: dict[int, dict[str, float]] = {}
+    final_margins: dict[str, float] = {}
+    skipped: list[str] = []
+    for case in cases:
+        try:
+            contrast = answer_contrast(tokenizer, case)
+        except ValueError:
+            if not skip_inseparable:
+                raise
+            skipped.append(case.case_id)
+            continue
+        lens_logits, model_logits, _ids = lens.apply(
+            model,
+            case.prompt + contrast.prefix,
+            layers=None if layers is None else list(layers),
+            positions=[position],
+            use_jacobian=use_jacobian,
+        )
+        for layer, logits in lens_logits.items():
+            lens_margins.setdefault(int(layer), {})[case.case_id] = answer_margin(
+                logits[0].tolist(), contrast.lure_token_id, contrast.correct_token_id
+            )
+        final_margins[case.case_id] = answer_margin(
+            model_logits[0].tolist(), contrast.lure_token_id, contrast.correct_token_id
+        )
+    return lens_margins, final_margins, skipped
 
 
 def condition_trajectories(
@@ -351,14 +618,23 @@ __all__ = [
     "DEFAULT_CONDITIONS",
     "DEFAULT_FIT_PROMPTS",
     "DEFAULT_TARGET_LAYER",
+    "AnswerContrast",
     "LayerReadout",
+    "answer_contrast",
+    "answer_margin",
     "answers_are_separable",
+    "bootstrap_delta_ci",
     "case_trajectory",
+    "comparison_rows",
     "condition_trajectories",
     "divergence_layer",
     "first_token_id",
-    "load_or_fit_lens",
+    "layer_correlations",
     "lens_answer_direction",
+    "load_or_fit_lens",
+    "margin_scan",
+    "spearman",
+    "split_fit_eval",
     "token_rank",
     "trajectory_rows",
     "wrap_model",
