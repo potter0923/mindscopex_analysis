@@ -200,6 +200,39 @@ def _control_cases(cases: list[Any]) -> list[Any]:
     return out
 
 
+def _response_key(response: Any) -> tuple[str, str, Any, int]:
+    return (response.model_id, response.case_id, response.enable_thinking, int(response.seed))
+
+
+def _load_previous_responses(path: Path) -> list[Any]:
+    """Responses a killed run already wrote, rebuilt as ``QwenTextResponse`` objects.
+
+    ``as_dict`` also writes derived properties (``mode``, ``evaluation_label`` ...);
+    only real dataclass fields are passed back, and JSON lists become the tuples the
+    frozen dataclass expects. A missing or unreadable file means a fresh start.
+    """
+    from dataclasses import fields
+
+    from mindscopex_analysis.generation import QwenTextResponse
+
+    if not path.exists():
+        return []
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        print(f"Could not read {path}; starting fresh", flush=True)
+        return []
+    names = {f.name for f in fields(QwenTextResponse)}
+    out = []
+    for row in rows:
+        kwargs = {key: value for key, value in row.items() if key in names}
+        for key in ("retry_reasons", "attempt_history"):
+            if isinstance(kwargs.get(key), list):
+                kwargs[key] = tuple(kwargs[key])
+        out.append(QwenTextResponse(**kwargs))
+    return out
+
+
 def _save_figures(
     responses: list[Any],
     figures_dir: Path,
@@ -244,7 +277,13 @@ def _save_figures(
     return written
 
 
-def run(config_path: Path, output_root: Path) -> Path:
+def run(
+    config_path: Path,
+    output_root: Path,
+    *,
+    resume: bool = True,
+    sync_dir: Path | None = None,
+) -> Path:
     config = load_toml(config_path)
     name = run_name(config)
     run_dir = output_root / name
@@ -315,36 +354,56 @@ def run(config_path: Path, output_root: Path) -> Path:
     }
     _write_json(manifest_path, manifest)
 
-    responses: list[Any] = []
-    save_every = 10
+    # Resume: a run killed by a dropped session keeps every response already on disk
+    # (saved after each one below) and only generates what is missing.
+    responses: list[Any] = _load_previous_responses(output_json) if resume else []
+    done_keys = {_response_key(r) for r in responses}
+    if responses:
+        print(f"Resuming: {len(responses)} responses already on disk", flush=True)
+    manifest["resumed_with"] = len(responses)
+    _write_json(manifest_path, manifest)
+    total = len(model_ids) * len(seeds) * len(dataset_cases) * len(thinking_modes)
     start = time.time()
 
-    def _on_progress(done: int, total: int, response: Any) -> None:
+    def _on_progress(_done: int, _total: int, response: Any) -> None:
         responses.append(response)
+        done_keys.add(_response_key(response))
         short = response.model_id.rsplit("/", 1)[-1]
         print(
-            f"[{done}/{total}] {short} {response.mode} {response.case_id} "
+            f"[{len(responses)}/{total}] {short} {response.mode} {response.case_id} "
             f"-> {response.answer_label}/{response.evaluation_label}",
             flush=True,
         )
-        if done % save_every == 0:
-            save_qwen_text_responses(responses, output_json)
+        # Every response, not every tenth: a 27B thinking answer costs about a minute.
+        save_qwen_text_responses(responses, output_json)
+        if sync_dir is not None:
+            sync_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(output_json, sync_dir / output_json.name)
 
     for model_id in model_ids:
+        pending = [
+            (seed, case, [m for m in thinking_modes if (model_id, case.case_id, m, seed) not in done_keys])
+            for seed in seeds
+            for case in dataset_cases
+        ]
+        pending = [(seed, case, modes) for seed, case, modes in pending if modes]
+        if not pending:
+            print(f"{model_id}: nothing left to generate", flush=True)
+            continue
         model, tokenizer = load_qwen_text_generation_model(
             model_id,
             device_map=device_map,
             dtype=dtype,
         )
         try:
-            for seed in seeds:
-                print(f"Running {model_id} seed={seed} cases={len(dataset_cases)}", flush=True)
+            print(f"Running {model_id} pending={len(pending)} cases", flush=True)
+            for seed, case, modes in pending:
                 generate_crt_response_suite(
                     model,
                     tokenizer,
-                    dataset_cases,
+                    [case],
                     model_id=model_id,
-                    thinking_modes=thinking_modes,
+                    thinking_modes=modes,
                     use_chat_template=True,
                     system_prompt=system_prompt,
                     max_new_tokens=(
@@ -358,19 +417,22 @@ def run(config_path: Path, output_root: Path) -> Path:
                     constrained=constrained,
                     progress_callback=_on_progress,
                 )
-                save_qwen_text_responses(responses, output_json)
-                save_crt_markdown_report(
-                    responses,
-                    report_md,
-                    dataset_name=f"{dataset_name}:{protocol_name}",
-                    dataset_reference=dataset_reference,
-                )
-                _write_json(summary_path, summarize_crt_accuracy(responses))
-                _write_json(family_summary_path, summarize_crt_accuracy_by_family(responses))
         finally:
             del model
             del tokenizer
             clear_device_cache()
+
+    save_qwen_text_responses(responses, output_json)
+    save_crt_markdown_report(
+        responses,
+        report_md,
+        dataset_name=f"{dataset_name}:{protocol_name}",
+        dataset_reference=dataset_reference,
+    )
+    _write_json(summary_path, summarize_crt_accuracy(responses))
+    _write_json(family_summary_path, summarize_crt_accuracy_by_family(responses))
+    if sync_dir is not None:
+        shutil.copytree(run_dir, sync_dir, dirs_exist_ok=True)
 
     figure_paths = _save_figures(responses, run_dir / "figures")
     manifest.update(
@@ -396,8 +458,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True, type=Path)
     parser.add_argument("--output-root", default=Path("outputs/experiments"), type=Path)
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Ignore responses.json already in the run directory and start over.",
+    )
+    parser.add_argument(
+        "--sync-dir",
+        type=Path,
+        default=None,
+        help="Copy responses.json here after every response (e.g. a folder in the repo).",
+    )
     args = parser.parse_args()
-    run(args.config, args.output_root)
+    run(args.config, args.output_root, resume=not args.no_resume, sync_dir=args.sync_dir)
 
 
 if __name__ == "__main__":
