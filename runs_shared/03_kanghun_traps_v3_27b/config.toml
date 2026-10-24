@@ -1,5 +1,4 @@
-# v3 on 27B: scale the families that fired in v1/v2, pilot four new ones.
-# Same protocol as 01_/02_ (reasoning OFF/ON, forced correct-vs-lure, controls on).
+# Replication: seeds 43, 44 added to the v3 27B run (seed 42 resumes as done).
 [run]
 name = "03_kanghun_traps_v3_27b"
 job = "crt_text_responses"
@@ -15,7 +14,7 @@ device_map = "auto"
 
 [generation]
 protocol = "qwen_native"
-seeds = [42]
+seeds = [42, 43, 44]
 thinking_modes = [false, true]
 output_mode = "binary_choice"
 max_new_tokens = 2048
