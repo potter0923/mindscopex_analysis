@@ -1,9 +1,9 @@
 # CRT text-generation result summary
 
-- Generated at: `2026-10-24T09:18:24+00:00`
+- Generated at: `2026-10-24T15:46:12+00:00`
 - Dataset: `kanghun_traps_v4:qwen_native`
 - Dataset reference: kanghun_traps_v4
-- Final responses: **96**
+- Final responses: **288**
 
 ## Headline results
 
@@ -11,8 +11,8 @@
 
 | Model | Mode | N | Correct | Lure | Hallucination | Accuracy | Retried |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Qwen3.5-27B | non_thinking | 48 | 44 | 4 | 0 | 91.7% | 0 |
-| Qwen3.5-27B | thinking | 48 | 47 | 1 | 0 | 97.9% | 0 |
+| Qwen3.5-27B | non_thinking | 144 | 132 | 12 | 0 | 91.7% | 0 |
+| Qwen3.5-27B | thinking | 144 | 140 | 4 | 0 | 97.2% | 0 |
 
 ## Results by CRT family
 
@@ -20,22 +20,22 @@ Wilson intervals below treat rows as independent Bernoulli observations. When th
 
 | Model | Mode | Family | N | Correct | Lure | Other | Accuracy | Lure rate (Wilson 95% CI) |
 |---|---|---|---:|---:|---:|---:|---:|---:|
-| Qwen3.5-27B | non_thinking | relative_reference | 6 | 5 | 1 | 0 | 83.3% | 16.7% [3.0%, 56.4%] |
-| Qwen3.5-27B | thinking | relative_reference | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | percent_symmetry | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | thinking | percent_symmetry | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | instruction_inversion | 6 | 5 | 1 | 0 | 83.3% | 16.7% [3.0%, 56.4%] |
-| Qwen3.5-27B | thinking | instruction_inversion | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | wordplay_referent | 6 | 5 | 1 | 0 | 83.3% | 16.7% [3.0%, 56.4%] |
-| Qwen3.5-27B | thinking | wordplay_referent | 6 | 5 | 1 | 0 | 83.3% | 16.7% [3.0%, 56.4%] |
-| Qwen3.5-27B | non_thinking | relative_reference__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | thinking | relative_reference__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | percent_symmetry__control | 6 | 5 | 1 | 0 | 83.3% | 16.7% [3.0%, 56.4%] |
-| Qwen3.5-27B | thinking | percent_symmetry__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | instruction_inversion__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | thinking | instruction_inversion__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | non_thinking | wordplay_referent__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
-| Qwen3.5-27B | thinking | wordplay_referent__control | 6 | 6 | 0 | 0 | 100.0% | 0.0% [0.0%, 39.0%] |
+| Qwen3.5-27B | non_thinking | relative_reference | 18 | 15 | 3 | 0 | 83.3% | 16.7% [5.8%, 39.2%] |
+| Qwen3.5-27B | thinking | relative_reference | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | non_thinking | percent_symmetry | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | thinking | percent_symmetry | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | non_thinking | instruction_inversion | 18 | 15 | 3 | 0 | 83.3% | 16.7% [5.8%, 39.2%] |
+| Qwen3.5-27B | thinking | instruction_inversion | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | non_thinking | wordplay_referent | 18 | 15 | 3 | 0 | 83.3% | 16.7% [5.8%, 39.2%] |
+| Qwen3.5-27B | thinking | wordplay_referent | 18 | 15 | 3 | 0 | 83.3% | 16.7% [5.8%, 39.2%] |
+| Qwen3.5-27B | non_thinking | relative_reference__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | thinking | relative_reference__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | non_thinking | percent_symmetry__control | 18 | 15 | 3 | 0 | 83.3% | 16.7% [5.8%, 39.2%] |
+| Qwen3.5-27B | thinking | percent_symmetry__control | 18 | 17 | 1 | 0 | 94.4% | 5.6% [1.0%, 25.8%] |
+| Qwen3.5-27B | non_thinking | instruction_inversion__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | thinking | instruction_inversion__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | non_thinking | wordplay_referent__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
+| Qwen3.5-27B | thinking | wordplay_referent__control | 18 | 18 | 0 | 0 | 100.0% | 0.0% [0.0%, 17.6%] |
 
 ## Quality and retry diagnostics
 

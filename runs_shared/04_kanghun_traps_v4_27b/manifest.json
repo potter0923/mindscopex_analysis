@@ -1,8 +1,8 @@
 {
   "run_name": "04_kanghun_traps_v4_27b",
   "job": "crt_text_responses",
-  "started_at": "2026-10-24T08:46:17+00:00",
-  "config_path": "experiments/configs/04_kanghun_traps_v4_27b.toml",
+  "started_at": "2026-10-24T14:39:13+00:00",
+  "config_path": "experiments/configs/04_kanghun_traps_v4_27b_seeds.toml",
   "output_dir": "runs_shared/04_kanghun_traps_v4_27b",
   "dataset": "kanghun_traps_v4",
   "dataset_preset": "id:kanghun_traps_v4",
@@ -12,7 +12,9 @@
     "Qwen/Qwen3.5-27B"
   ],
   "seeds": [
-    42
+    42,
+    43,
+    44
   ],
   "thinking_modes": [
     false,
@@ -27,12 +29,12 @@
   "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
   "cuda_available": true,
   "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
-  "git_commit": "d6edfb17edf2b962ab7241778044461403921d98",
-  "git_status": "?? runs_shared/04_kanghun_traps_v4_27b/",
-  "resumed_with": 0,
-  "finished_at": "2026-10-24T09:18:24+00:00",
-  "elapsed_seconds": 1926.883,
-  "n_responses": 96,
+  "git_commit": "4fd3408abcecf3a15d4df0c11cf388ce9ffae8f5",
+  "git_status": "M runs_shared/04_kanghun_traps_v4_27b/config.toml",
+  "resumed_with": 96,
+  "finished_at": "2026-10-24T15:46:13+00:00",
+  "elapsed_seconds": 4019.411,
+  "n_responses": 288,
   "artifacts": {
     "responses": "runs_shared/04_kanghun_traps_v4_27b/responses.json",
     "summary_markdown": "runs_shared/04_kanghun_traps_v4_27b/summary.md",
