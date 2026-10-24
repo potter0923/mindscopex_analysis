@@ -1,0 +1,29 @@
+# CRT baseline: hagendorff_crt, 10 per family + controls, on 27b, same protocol.
+[run]
+name = "31_hagendorff10_27b"
+job = "crt_text_responses"
+
+[dataset]
+preset = "hagendorff_full"
+limit_per_family = 10
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
