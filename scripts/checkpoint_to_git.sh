@@ -14,9 +14,12 @@ cd "$(dirname "$0")/.."
 while true; do
   sleep "$INTERVAL"
   [ -d "$DEST" ] || continue
-  git add "$DEST"
-  if git -c user.name="이강훈" -c user.email="kanghun@sk.com" \
-      commit -qm "Checkpoint $(basename "$DEST") ($(date -u +%H:%M))"; then
-    git push -q && echo "$(date -u +%H:%M) pushed" || echo "$(date -u +%H:%M) push failed"
-  fi
+  # flock serializes with run_queue.sh so the two never fight over .git/index.lock
+  flock /tmp/mindscopex_git.lock bash -c '
+    git add "$1"
+    if git -c user.name="이강훈" -c user.email="kanghun@sk.com" \
+        commit -qm "Checkpoint $(basename "$1") ($(date -u +%H:%M))"; then
+      git push -q && echo "$(date -u +%H:%M) pushed" || echo "$(date -u +%H:%M) push failed"
+    fi
+  ' _ "$DEST"
 done

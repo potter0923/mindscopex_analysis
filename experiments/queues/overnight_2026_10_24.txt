@@ -1,0 +1,20 @@
+# Overnight queue on one G4 session, 27B only. The goal downstream is to localize
+# the lure inside 27B (the only SAE-matched model), so tonight's job is to find
+# items 27B *reliably* falls for with thinking off and recovers from with it on.
+# 9B/2B runs are left out: their SAEs are base-model ones and say nothing about
+# the 27B mechanism. One config per line; every run resumes from runs_shared/.
+
+# 1. family exploration: which families fire on 27B at all
+experiments/configs/03_kanghun_traps_v3_27b.toml
+experiments/configs/04_kanghun_traps_v4_27b.toml
+
+# 2. CRT baseline under the same protocol (expected near 0% lure on 27B)
+experiments/configs/31_hagendorff10_27b.toml
+
+# 3. replication: an item is usable for mechanism work only if it fires every time
+experiments/configs/03_kanghun_traps_v3_27b_seeds.toml
+experiments/configs/04_kanghun_traps_v4_27b_seeds.toml
+experiments/configs/02_kanghun_traps_v2_27b_seeds.toml
+
+# 4. if time is left: the externally written set
+experiments/configs/01_external_traps_27b.toml

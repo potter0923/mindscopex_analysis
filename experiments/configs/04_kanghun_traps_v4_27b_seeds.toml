@@ -1,0 +1,29 @@
+# Replication: seeds 43, 44 added to the v4 27B run (seed 42 resumes as done).
+# Same protocol as 01_/02_ (reasoning OFF/ON, forced correct-vs-lure, controls on).
+[run]
+name = "04_kanghun_traps_v4_27b"
+job = "crt_text_responses"
+
+[dataset]
+id = "kanghun_traps_v4"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42, 43, 44]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"

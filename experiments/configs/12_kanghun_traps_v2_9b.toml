@@ -1,0 +1,28 @@
+# Scale sweep: kanghun_traps_v2 on 9b, same protocol as the 27B screens.
+[run]
+name = "12_kanghun_traps_v2_9b"
+job = "crt_text_responses"
+
+[dataset]
+id = "kanghun_traps_v2"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-9B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
