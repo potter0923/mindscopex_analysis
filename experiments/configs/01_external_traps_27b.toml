@@ -1,0 +1,29 @@
+# Pilot screen of the externally written draft set (external_traps_v1) on 27B.
+# Same protocol as 01_kanghun_traps_27b so the two drafts are directly comparable.
+[run]
+name = "01_external_traps_27b"
+job = "crt_text_responses"
+
+[dataset]
+id = "external_traps_v1"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"

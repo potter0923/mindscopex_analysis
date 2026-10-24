@@ -250,7 +250,12 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
             f"{row['layer']:5d}"
             f"{_fmt(row['jacobian'])}{_fmt(row['logit'])}{_fmt(row['delta'])}"
         )
-    verdict = "J-lens ahead" if overall["low"] > 0 else "not separable from zero"
+    if overall["low"] > 0:
+        verdict = "J-lens ahead"
+    elif overall["high"] < 0:
+        verdict = "logit lens ahead"
+    else:
+        verdict = "not separable from zero"
     print(
         f"\nmean over {len(overall['layers'])} layers: "
         f"delta {overall['delta']:+.3f} "

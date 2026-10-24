@@ -140,22 +140,64 @@ def _resolve_model_ids(raw: Any) -> list[str]:
 
 def _load_cases(config: dict[str, Any]) -> tuple[list[Any], str, str, str]:
     dataset_cfg = table(config, "dataset")
-    preset_name = str(dataset_cfg.get("preset", "hagendorff_smoke"))
-    if preset_name not in RUN_PRESETS:
-        raise ValueError(f"Unknown dataset preset: {preset_name!r}. Options: {sorted(RUN_PRESETS)}")
-
-    preset = RUN_PRESETS[preset_name]
-    dataset_name = preset["dataset"]
     families = dataset_cfg.get("families")
-    limit_per_family = dataset_cfg.get("limit_per_family", preset["limit_per_family"])
+    if "id" in dataset_cfg:
+        # Any committed data/<id>.json, so new item sets need no preset entry.
+        dataset_name = str(dataset_cfg["id"])
+        preset_name = f"id:{dataset_name}"
+        limit_per_family = dataset_cfg.get("limit_per_family")
+    else:
+        preset_name = str(dataset_cfg.get("preset", "hagendorff_smoke"))
+        if preset_name not in RUN_PRESETS:
+            raise ValueError(
+                f"Unknown dataset preset: {preset_name!r}. Options: {sorted(RUN_PRESETS)}"
+            )
+        preset = RUN_PRESETS[preset_name]
+        dataset_name = preset["dataset"]
+        limit_per_family = dataset_cfg.get("limit_per_family", preset["limit_per_family"])
     cases = lure_dataset_cases(
         dataset_name,
         families=tuple(families) if families else None,
         limit_per_family=limit_per_family,
     )
+    if dataset_cfg.get("include_controls", False):
+        cases = cases + _control_cases(cases)
     source = lure_dataset_info(dataset_name).source
     dataset_reference = source.get("doi") or source.get("project_url") or dataset_name
     return cases, preset_name, dataset_name, dataset_reference
+
+
+def _control_cases(cases: list[Any]) -> list[Any]:
+    """The matched control of each trap, run as a case of its own.
+
+    The control removes the decisive condition, so the trap's lure is the correct
+    answer there. Scoring it with the answers swapped makes "correct" mean the same
+    thing in both rows. Its family gets a ``__control`` suffix so the per-family
+    summary keeps traps and controls apart: an item set is only usable when the trap
+    draws the lure *and* the control is answered correctly.
+    """
+    from dataclasses import replace
+
+    out = []
+    seen: set[str] = set()
+    for case in cases:
+        # Ladder rungs share one control; run it once, not once per rung.
+        if not getattr(case, "control_prompt", "") or case.control_prompt in seen:
+            continue
+        seen.add(case.control_prompt)
+        out.append(
+            replace(
+                case,
+                case_id=f"{case.case_id}__control",
+                family=f"{case.family}__control",
+                prompt=case.control_prompt,
+                correct_answer=case.lure_answer,
+                lure_answer=case.correct_answer,
+                control_prompt="",
+                condition="control",
+            )
+        )
+    return out
 
 
 def _save_figures(
