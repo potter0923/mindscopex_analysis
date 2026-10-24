@@ -1,0 +1,46 @@
+{
+  "run_name": "01_external_traps_27b",
+  "job": "crt_text_responses",
+  "started_at": "2026-10-24T17:09:10+00:00",
+  "config_path": "experiments/configs/01_external_traps_27b.toml",
+  "output_dir": "runs_shared/01_external_traps_27b",
+  "dataset": "external_traps_v1",
+  "dataset_preset": "id:external_traps_v1",
+  "dataset_reference": "external_traps_v1",
+  "n_cases": 35,
+  "model_ids": [
+    "Qwen/Qwen3.5-27B"
+  ],
+  "seeds": [
+    42
+  ],
+  "thinking_modes": [
+    false,
+    true
+  ],
+  "generation_protocol": "qwen_native",
+  "output_mode": "binary_choice",
+  "max_new_tokens": 2048,
+  "max_retries": 2,
+  "dtype": "bfloat16",
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+  "cuda_available": true,
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "git_commit": "4e4d1b3f1a0d1b56bd31ee179519050dd78fd1e5",
+  "git_status": "?? runs_shared/01_external_traps_27b/",
+  "resumed_with": 0,
+  "finished_at": "2026-10-24T17:33:33+00:00",
+  "elapsed_seconds": 1463.29,
+  "n_responses": 70,
+  "artifacts": {
+    "responses": "runs_shared/01_external_traps_27b/responses.json",
+    "summary_markdown": "runs_shared/01_external_traps_27b/summary.md",
+    "summary_json": "runs_shared/01_external_traps_27b/summary.json",
+    "family_summary_json": "runs_shared/01_external_traps_27b/family_summary.json",
+    "figures": [
+      "runs_shared/01_external_traps_27b/figures/headline_accuracy.png",
+      "runs_shared/01_external_traps_27b/figures/family_lure_rate.png"
+    ]
+  }
+}
