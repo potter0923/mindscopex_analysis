@@ -1,9 +1,9 @@
 {
   "run_name": "02_kanghun_traps_v2_27b",
   "job": "crt_text_responses",
-  "started_at": "2026-10-24T04:52:42+00:00",
-  "config_path": "experiments/configs/02_kanghun_traps_v2_27b.toml",
-  "output_dir": "/content/out/02_kanghun_traps_v2_27b",
+  "started_at": "2026-10-24T15:46:16+00:00",
+  "config_path": "experiments/configs/02_kanghun_traps_v2_27b_seeds.toml",
+  "output_dir": "runs_shared/02_kanghun_traps_v2_27b",
   "dataset": "kanghun_traps_v2",
   "dataset_preset": "id:kanghun_traps_v2",
   "dataset_reference": "kanghun_traps_v2",
@@ -12,7 +12,9 @@
     "Qwen/Qwen3.5-27B"
   ],
   "seeds": [
-    42
+    42,
+    43,
+    44
   ],
   "thinking_modes": [
     false,
@@ -27,19 +29,20 @@
   "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
   "cuda_available": true,
   "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
-  "git_commit": "7687637ae5b4c830a21636fd3acad487494cbeee",
-  "git_status": "",
-  "finished_at": "2026-10-24T05:36:00+00:00",
-  "elapsed_seconds": 2598.778,
-  "n_responses": 72,
+  "git_commit": "8b1c130543f8ca28a4cbfc774bfe854aa09a8c14",
+  "git_status": "M runs_shared/02_kanghun_traps_v2_27b/config.toml",
+  "resumed_with": 72,
+  "finished_at": "2026-10-24T17:09:07+00:00",
+  "elapsed_seconds": 4970.552,
+  "n_responses": 216,
   "artifacts": {
-    "responses": "/content/out/02_kanghun_traps_v2_27b/responses.json",
-    "summary_markdown": "/content/out/02_kanghun_traps_v2_27b/summary.md",
-    "summary_json": "/content/out/02_kanghun_traps_v2_27b/summary.json",
-    "family_summary_json": "/content/out/02_kanghun_traps_v2_27b/family_summary.json",
+    "responses": "runs_shared/02_kanghun_traps_v2_27b/responses.json",
+    "summary_markdown": "runs_shared/02_kanghun_traps_v2_27b/summary.md",
+    "summary_json": "runs_shared/02_kanghun_traps_v2_27b/summary.json",
+    "family_summary_json": "runs_shared/02_kanghun_traps_v2_27b/family_summary.json",
     "figures": [
-      "/content/out/02_kanghun_traps_v2_27b/figures/headline_accuracy.png",
-      "/content/out/02_kanghun_traps_v2_27b/figures/family_lure_rate.png"
+      "runs_shared/02_kanghun_traps_v2_27b/figures/headline_accuracy.png",
+      "runs_shared/02_kanghun_traps_v2_27b/figures/family_lure_rate.png"
     ]
   }
 }

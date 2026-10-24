@@ -1,6 +1,4 @@
-# Large-model trap families (trivialized classics, redefinition, memo override) on 27B.
-# Reasoning OFF/ON, forced correct-vs-lure, matched controls included. Same protocol
-# as 01_* so the arithmetic drafts and these families compare directly.
+# Replication: seeds 43, 44 added to the v2 27B run (seed 42 resumes as done).
 [run]
 name = "02_kanghun_traps_v2_27b"
 job = "crt_text_responses"
@@ -16,7 +14,7 @@ device_map = "auto"
 
 [generation]
 protocol = "qwen_native"
-seeds = [42]
+seeds = [42, 43, 44]
 thinking_modes = [false, true]
 output_mode = "binary_choice"
 max_new_tokens = 2048
