@@ -1,0 +1,27 @@
+{
+  "run_name": "40_lure27b_study_margin",
+  "job": "research_experiments",
+  "started_at": "2026-10-25T03:59:38+00:00",
+  "requested_kind": "study_margin",
+  "margin_kinds": [
+    "phenomenon",
+    "discover",
+    "control_specificity",
+    "causal_heldout"
+  ],
+  "gen_kinds": [],
+  "profile": "27b",
+  "model_id": "Qwen/Qwen3.5-27B",
+  "sae_repo_id": "Qwen/SAE-Res-Qwen3.5-27B-W80K-L0_50",
+  "dataset": "kanghun_lure27b_v1",
+  "n_all": 18,
+  "n_train": 12,
+  "n_test": 6,
+  "train_frac": 0.6,
+  "split_seed": 1,
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+  "cuda_available": true,
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "git_commit": "69ec85e05a18e0b608283f2a3ffb428bae501ac0"
+}
