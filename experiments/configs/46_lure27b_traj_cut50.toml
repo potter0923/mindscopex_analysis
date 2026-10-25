@@ -1,0 +1,39 @@
+# Control for run 43, analysis only: thinking trace replaced by first 50% of the real reasoning, closed early.
+# traces.json is written by scripts/make_variant_traces.py; reuse_traces skips generation.
+[run]
+name = "46_lure27b_traj_cut50"
+job = "reasoning_trajectory"
+
+[feature]
+feature_id = 65825
+layer = 55
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+train_frac = 0.01
+split_seed = 1
+instruction = true
+max_items = 0           # read every item the split leaves in the test half
+
+[trajectory]
+phases = 5
+max_new_tokens = 6000   # run 42 at 2048 closed </think> on only 3 of 18 traces
+thinking_modes = [false, true]
+seed = 42
+measure_margin = true
+reuse_traces = true
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"

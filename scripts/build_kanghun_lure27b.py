@@ -90,5 +90,45 @@ def main() -> None:
     print(f"{path}  n={len(cases)}  {counts}")
 
 
+
+def build_controls() -> None:
+    """``kanghun_lure27b_v1_ctl``: each matched control as a case of its own.
+
+    The prompt is the control question (decisive change undone), and the answers are
+    swapped so ``correct`` is the memorised word, which is right there. Used to ask
+    whether the feature is also off after real thinking when there is no conflict.
+    """
+    source = json.loads((DATA / f"{DATASET_ID}.json").read_text(encoding="utf-8"))
+    cases = []
+    for row in source["cases"]:
+        cases.append(
+            {
+                **row,
+                "case_id": f"{row['case_id']}_ctl",
+                "condition": "control",
+                "question": row["control_question"],
+                "correct_answer": row["lure_answer"],
+                "lure_answer": row["correct_answer"],
+                "control_question": "",
+                "note": f"[control of {row['case_id']}] {row['note']}",
+            }
+        )
+    payload = {
+        **{k: v for k, v in source.items() if k != "cases"},
+        "dataset_id": f"{DATASET_ID}_ctl",
+        "title": "27B lure set v1 -- matched controls as standalone cases",
+        "description": (
+            "The matched control of every kanghun_lure27b_v1 item as its own case, with "
+            "answers swapped so the memorised word is the correct answer."
+        ),
+        "n_cases": len(cases),
+        "cases": cases,
+    }
+    path = DATA / f"{DATASET_ID}_ctl.json"
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"{path}  n={len(cases)}")
+
+
 if __name__ == "__main__":
     main()
+    build_controls()
