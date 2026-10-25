@@ -1,0 +1,67 @@
+# First mechanism pass on the items 27B reliably falls for (kanghun_lure27b_v1).
+#
+# study_margin = phenomenon -> discover -> control_specificity -> causal_heldout.
+#   phenomenon          baseline lure-vs-correct margin on every item. This pipeline
+#                       scores raw text with the answer instruction prefixed (no chat
+#                       template), unlike the screen; if most items do not prefer the
+#                       lure here, nothing downstream is interpretable.
+#   discover            on the train split: SAE features whose removal most lowers the
+#                       lure margin, scored against matched random directions and a
+#                       selection-adjusted peer-feature null (the 8/23 lesson).
+#   control_specificity same feature on the held-out controls, where the lure is the
+#                       correct answer: a lure-specific feature should not break them.
+#   causal_heldout      same feature on held-out traps it was never selected on.
+#
+# split_seed = 1 was fixed before running, from split statistics alone: 12 train /
+# 6 held-out, with non-memo items on both sides (2 / 1). Layers cover the band where
+# 동준's 27B features sit (47, 55) and earlier ones.
+[run]
+name = "40_lure27b_study_margin"
+job = "research_experiments"
+
+[experiment]
+kind = "study_margin"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"     # G4 has room for 27B plus one SAE on the GPU
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[discover]
+layers = [15, 23, 31, 39, 47, 55]
+objective = "hostile_margin"
+select_by = "selection_adjusted"
+candidate_top_n = 10
+min_active_cases = 3
+max_candidates = 16
+max_cases = 8           # leaves 4 train items outside discovery for the screen null
+coefficient = 1.0
+intervention_mode = "remove_activation"
+null_samples = 32
+null_seed = 0
+null_cases = 3
+
+[null]
+selection_adjusted = true
+top_m = 3
+panel_cases = 3
+gaussian_draws = 100
+peer_draws = 100
+bootstrap = 20000
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
