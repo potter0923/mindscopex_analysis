@@ -588,42 +588,58 @@ def run(config_path: Path, output_root: Path) -> Path:
     started = time.time()
 
     # --- phase 1: generate the traces --------------------------------------
-    _log(f"generation phase: loading {env['behavior_model_id']}")
-    model, tokenizer = load_qwen_text_generation_model(
-        env["behavior_model_id"], device_map=env["device_map"], dtype=env["dtype"]
-    )
-    traces: list[dict[str, Any]] = []
-    try:
-        for index, case in enumerate(items, start=1):
-            for thinking in thinking_modes:
-                response = generate_qwen_text_response(
-                    model,
-                    tokenizer,
-                    case,
-                    model_id=env["behavior_model_id"],
-                    enable_thinking=thinking,
-                    max_new_tokens=max_new_tokens,
-                    do_sample=False,  # greedy: the two conditions must differ only by
-                    seed=seed,  # the thinking switch, not by sampling noise
-                )
-                traces.append(
-                    {
-                        "case_id": case.case_id,
-                        "family": case.family,
-                        "mode": response.mode,
-                        "thinking": bool(thinking),
-                        "raw_text": response.raw_text,
-                        "answer": response.answer,
-                        "answer_label": response.answer_label,
-                        "output_tokens": response.output_tokens,
-                        "has_thinking_block": response.has_thinking_block,
-                    }
-                )
-            _log(f"generated {index}/{len(items)}")
-    finally:
-        del model, tokenizer
-        clear_device_cache()
-    _write_json(run_dir / "traces.json", traces)
+    # Generation is the slow half (greedy, up to max_new_tokens per thinking trace).
+    # If a previous attempt already wrote traces.json for exactly these items, reuse
+    # it: greedy decoding would reproduce the same traces, so regenerating only costs
+    # time. Set [trajectory] reuse_traces = false to force a fresh generation.
+    traces_path = run_dir / "traces.json"
+    reuse = bool(tcfg.get("reuse_traces", True))
+    expected = {(case.case_id, bool(t)) for case in items for t in thinking_modes}
+    traces: list[dict[str, Any]] | None = None
+    if reuse and traces_path.exists():
+        cached = json.loads(traces_path.read_text(encoding="utf-8"))
+        if {(t["case_id"], bool(t["thinking"])) for t in cached} == expected:
+            _log(f"reusing {len(cached)} traces from {traces_path}")
+            traces = cached
+        else:
+            _log("traces.json does not match these items; regenerating")
+    if traces is None:
+        _log(f"generation phase: loading {env['behavior_model_id']}")
+        model, tokenizer = load_qwen_text_generation_model(
+            env["behavior_model_id"], device_map=env["device_map"], dtype=env["dtype"]
+        )
+        traces = []
+        try:
+            for index, case in enumerate(items, start=1):
+                for thinking in thinking_modes:
+                    response = generate_qwen_text_response(
+                        model,
+                        tokenizer,
+                        case,
+                        model_id=env["behavior_model_id"],
+                        enable_thinking=thinking,
+                        max_new_tokens=max_new_tokens,
+                        do_sample=False,  # greedy: the two conditions must differ only by
+                        seed=seed,  # the thinking switch, not by sampling noise
+                    )
+                    traces.append(
+                        {
+                            "case_id": case.case_id,
+                            "family": case.family,
+                            "mode": response.mode,
+                            "thinking": bool(thinking),
+                            "raw_text": response.raw_text,
+                            "answer": response.answer,
+                            "answer_label": response.answer_label,
+                            "output_tokens": response.output_tokens,
+                            "has_thinking_block": response.has_thinking_block,
+                        }
+                    )
+                _log(f"generated {index}/{len(items)}")
+        finally:
+            del model, tokenizer
+            clear_device_cache()
+        _write_json(run_dir / "traces.json", traces)
 
     # --- phase 2: read the feature along each trace ------------------------
     _log(f"analysis phase: loading {env['analysis_model_id']}")

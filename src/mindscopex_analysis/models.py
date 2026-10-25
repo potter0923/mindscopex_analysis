@@ -274,6 +274,10 @@ def _wrap_preloaded(
             load_kwargs["torch_dtype"] = load_kwargs.pop("dtype")
         hf_model = model_class.from_pretrained(model_id, **load_kwargs)
     hf_model.eval()
+    # Analysis only reads activations. With parameters left trainable every forward
+    # builds an autograd graph, which is invisible on 100-token prompts and fills a
+    # 96 GB GPU on a 2k-token reasoning trace.
+    hf_model.requires_grad_(False)
     tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
     return language_model_cls(hf_model, tokenizer=tokenizer)
 
