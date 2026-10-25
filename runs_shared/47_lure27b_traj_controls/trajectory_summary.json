@@ -1,0 +1,114 @@
+{
+  "feature_id": 65825,
+  "layer": 55,
+  "n_traces": 36,
+  "trace_diagnostics": {
+    "skipped_empty_continuation": 0,
+    "skipped_token_count_mismatch": 0,
+    "prompt_boundary_merges": 2
+  },
+  "cue_coverage": {
+    "cases_with_cue": 0,
+    "cases_seen": 18,
+    "no_cue_text": 18,
+    "expected_no_cue": 0,
+    "not_found_in_prompt": 0,
+    "not_found_by_condition": {}
+  },
+  "margin": {
+    "enabled": true,
+    "cost": "2 forwards per distinct sampled position (one per answer string)",
+    "failed_positions": 0,
+    "prefix_length_mismatches": 0
+  },
+  "not_measured": {
+    "pre_answer_difference": "no cross-arm contrast at the answer position. Without </think> the answer starts at the first generated token, so the no-thinking arm's answer position is its last prompt token; both arms are read on the same prompt under causal attention, so that residual is identical in the two conditions and the difference would reduce to per_mode.thinking.pre_answer_minus_prompt_last with no no-thinking-trace data in it"
+  },
+  "phase_notes": {
+    "cue": "last token of the lure clause inside the prompt; fraction is -1 because the quantile scale covers only the generated span",
+    "pre_answer": "the token the answer is emitted from, i.e. </think> - 1. Thinking arm only, and there it is the same token the last reasoning quantile samples, so pre_answer_minus_prompt_last equals the last reasoning phase minus prompt_last by construction",
+    "rates": "fire_rate/topk_rate are averaged over distinct token positions per trace, so the repeated pre_answer row does not weight </think> twice. Not comparable with the fire_rate of runs made before this change, whose denominator was every emitted row"
+  },
+  "per_mode": {
+    "non_thinking": {
+      "phase_means": {
+        "prompt_last": 12.990019586351183,
+        "reasoning_0": 1.4792981048425038,
+        "reasoning_25": 0.0,
+        "reasoning_33": 9.504568099975586,
+        "reasoning_50": 0.0,
+        "reasoning_67": 0.0,
+        "reasoning_75": 0.0,
+        "reasoning_100": 0.07620397736044492
+      },
+      "margin_means": {
+        "prompt_last": -10.495369802914663,
+        "reasoning_0": -6.6067291894578375,
+        "reasoning_25": -5.553177859634161,
+        "reasoning_33": -12.234375,
+        "reasoning_50": -8.287097690626979,
+        "reasoning_67": -8.03125,
+        "reasoning_75": -6.912934640422463,
+        "reasoning_100": -1.7625081856146125
+      },
+      "reasoning_drift": -1.403094127482059,
+      "reasoning_drift_phases": [
+        "reasoning_0",
+        "reasoning_100"
+      ],
+      "pre_answer_minus_prompt_last": null,
+      "cue_minus_prompt_last": null,
+      "activation_margin_pearson": -0.4969773316765314,
+      "n_margin_pairs": 62,
+      "fire_rate_per_distinct_position": 0.3709677419354839,
+      "topk_rate_per_distinct_position": 0.3709677419354839,
+      "n_distinct_positions": 62,
+      "n_rows": 108
+    },
+    "thinking": {
+      "phase_means": {
+        "prompt_last": 13.209411462148031,
+        "reasoning_0": 0.0,
+        "reasoning_25": 0.0,
+        "reasoning_50": 0.0,
+        "reasoning_75": 0.0,
+        "reasoning_100": 0.0,
+        "pre_answer": 0.0
+      },
+      "margin_means": {
+        "prompt_last": -10.69523959126996,
+        "reasoning_0": -1.041482940536096,
+        "reasoning_25": -2.2793256628275333,
+        "reasoning_50": -2.5267639258979924,
+        "reasoning_75": -3.8903168456752915,
+        "reasoning_100": -13.987991593316515,
+        "pre_answer": -13.987991593316515
+      },
+      "reasoning_drift": 0.0,
+      "reasoning_drift_phases": [
+        "reasoning_0",
+        "reasoning_100"
+      ],
+      "pre_answer_minus_prompt_last": -13.209411462148031,
+      "cue_minus_prompt_last": null,
+      "activation_margin_pearson": -0.2909691437904467,
+      "n_margin_pairs": 108,
+      "fire_rate_per_distinct_position": 0.1574074074074074,
+      "topk_rate_per_distinct_position": 0.1574074074074074,
+      "n_distinct_positions": 108,
+      "n_rows": 126
+    }
+  },
+  "drift_difference": {
+    "modes": [
+      "non_thinking",
+      "thinking"
+    ],
+    "value": 1.403094127482059,
+    "phases": [
+      "reasoning_0",
+      "reasoning_100"
+    ],
+    "note": "thinking minus non_thinking; a positional feature drifts alike in both"
+  }
+}
