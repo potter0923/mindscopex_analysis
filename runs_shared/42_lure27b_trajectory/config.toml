@@ -1,0 +1,49 @@
+# Does thinking suppress L55 #65825 before the answer? (follow-up to runs 40 and 41)
+#
+# Run 41 showed that removing this feature moves 27B from the memorised lure to the
+# instructed answer with thinking off, while matched random directions do nothing.
+# If thinking resolves the same conflict the same way, the feature should be lower
+# at the token the answer is emitted from (</think>, "pre_answer") than at the last
+# prompt token where the no-thinking answer is emitted ("prompt_last"), and the lure
+# margin read at those positions should fall with it.
+#
+# Observational, no intervention, so all 18 items are read: train_frac is set so the
+# hash split leaves (almost) everything in the "test" half that this job reads.
+# Traces are generated greedily with the chat template and read back on the plain
+# prompt + trace string (the job's documented approximation).
+[run]
+name = "42_lure27b_trajectory"
+job = "reasoning_trajectory"
+
+[feature]
+feature_id = 65825
+layer = 55
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+train_frac = 0.01
+split_seed = 1
+instruction = true
+max_items = 0           # read every item the split leaves in the test half
+
+[trajectory]
+phases = 5
+max_new_tokens = 2048   # 27B thinking is long; shorter budgets lose the </think> position
+thinking_modes = [false, true]
+seed = 42
+measure_margin = true
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
