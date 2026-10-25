@@ -1,0 +1,46 @@
+# Follow-up to 40_lure27b_study_margin: dose, matched random directions and the
+# screen's own behaviour for the feature that pass found (L55 #65825).
+#
+# [data] must match run 40 exactly so the same 12 train / 6 held-out items are used.
+# Held-out items were never used to pick the feature; in-sample rows are reported
+# separately and are not evidence on their own.
+[run]
+name = "41_lure27b_feature_dose"
+job = "feature_dose"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[feature]
+layer = 55
+feature_id = 65825
+
+[dose]
+coefficients = [1, 2, 4, 8]   # remove k x the feature's own activation
+null_samples = 16             # random directions per case, matched perturbation norm
+null_seed = 0
+
+[behaviour]
+enabled = true
+coefficients = [1, 2, 4, 8]
+random_coefficients = [4, 8]
+random_seeds = [101, 102, 103]
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
