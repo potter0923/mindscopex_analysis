@@ -1,0 +1,38 @@
+# Control for run 43: real thinking on the matched controls (memorised word is correct).
+# Is the feature also off after thinking when there is no conflict to resolve?
+[run]
+name = "47_lure27b_traj_controls"
+job = "reasoning_trajectory"
+
+[feature]
+feature_id = 65825
+layer = 55
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1_ctl"
+train_frac = 0.01
+split_seed = 3   # seeds 1 and 2 drop controls into the unread half; 3 keeps all 18
+instruction = true
+max_items = 0           # read every item the split leaves in the test half
+
+[trajectory]
+phases = 5
+max_new_tokens = 6000   # run 42 at 2048 closed </think> on only 3 of 18 traces
+thinking_modes = [false, true]
+seed = 42
+measure_margin = true
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"

@@ -1,0 +1,25 @@
+{
+  "run_name": "47_lure27b_traj_controls",
+  "job": "reasoning_trajectory",
+  "started_at": "2026-10-25T08:19:22+00:00",
+  "feature_id": 65825,
+  "layer": 55,
+  "phases": 5,
+  "thinking_modes": [
+    false,
+    true
+  ],
+  "measure_margin": true,
+  "margin_cost": "2 forwards per distinct sampled position (one per answer string)",
+  "cue_source": "hostile_minus_neutral_twin",
+  "n_cue_texts": 0,
+  "profile": "27b",
+  "generation_model_id": "Qwen/Qwen3.5-27B",
+  "analysis_model_id": "Qwen/Qwen3.5-27B",
+  "sae_repo_id": "Qwen/SAE-Res-Qwen3.5-27B-W80K-L0_50",
+  "dataset": "kanghun_lure27b_v1_ctl",
+  "n_items": 18,
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+}
