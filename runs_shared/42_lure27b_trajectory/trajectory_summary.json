@@ -1,0 +1,142 @@
+{
+  "feature_id": 65825,
+  "layer": 55,
+  "n_traces": 36,
+  "trace_diagnostics": {
+    "skipped_empty_continuation": 0,
+    "skipped_token_count_mismatch": 0,
+    "prompt_boundary_merges": 5
+  },
+  "cue_coverage": {
+    "cases_with_cue": 0,
+    "cases_seen": 18,
+    "no_cue_text": 18,
+    "expected_no_cue": 0,
+    "not_found_in_prompt": 0,
+    "not_found_by_condition": {}
+  },
+  "margin": {
+    "enabled": true,
+    "cost": "2 forwards per distinct sampled position (one per answer string)",
+    "failed_positions": 0,
+    "prefix_length_mismatches": 0
+  },
+  "not_measured": {
+    "pre_answer_difference": "no cross-arm contrast at the answer position. Without </think> the answer starts at the first generated token, so the no-thinking arm's answer position is its last prompt token; both arms are read on the same prompt under causal attention, so that residual is identical in the two conditions and the difference would reduce to per_mode.thinking.pre_answer_minus_prompt_last with no no-thinking-trace data in it"
+  },
+  "phase_notes": {
+    "cue": "last token of the lure clause inside the prompt; fraction is -1 because the quantile scale covers only the generated span",
+    "pre_answer": "the token the answer is emitted from, i.e. </think> - 1. Thinking arm only, and there it is the same token the last reasoning quantile samples, so pre_answer_minus_prompt_last equals the last reasoning phase minus prompt_last by construction",
+    "rates": "fire_rate/topk_rate are averaged over distinct token positions per trace, so the repeated pre_answer row does not weight </think> twice. Not comparable with the fire_rate of runs made before this change, whose denominator was every emitted row"
+  },
+  "per_mode": {
+    "non_thinking": {
+      "phase_means": {
+        "prompt_last": 11.79791686269972,
+        "reasoning_0": 3.895430773496628,
+        "reasoning_20": 8.895054817199707,
+        "reasoning_22": 0.0,
+        "reasoning_25": 0.0,
+        "reasoning_26": 0.0,
+        "reasoning_27": 0.0,
+        "reasoning_29": 11.590036392211914,
+        "reasoning_33": 9.441186904907227,
+        "reasoning_44": 0.0,
+        "reasoning_50": 6.104985078175862,
+        "reasoning_51": 0.0,
+        "reasoning_55": 0.0,
+        "reasoning_57": 0.0,
+        "reasoning_67": 0.0,
+        "reasoning_71": 0.0,
+        "reasoning_73": 0.0,
+        "reasoning_74": 0.0,
+        "reasoning_75": 4.241072654724121,
+        "reasoning_78": 0.0,
+        "reasoning_80": 0.0,
+        "reasoning_100": 0.0
+      },
+      "margin_means": {
+        "prompt_last": 2.193167535070744,
+        "reasoning_0": -1.9743306738091633,
+        "reasoning_20": 6.0,
+        "reasoning_22": 0.71875,
+        "reasoning_25": 0.75,
+        "reasoning_26": 2.9375,
+        "reasoning_27": 4.062500104308128,
+        "reasoning_29": 0.625,
+        "reasoning_33": -0.2983388379216194,
+        "reasoning_44": 0.9375,
+        "reasoning_50": 1.5200470772882302,
+        "reasoning_51": -3.0,
+        "reasoning_55": 0.25,
+        "reasoning_57": 3.1874998807907104,
+        "reasoning_67": 3.060930486768484,
+        "reasoning_71": -4.500000476837158,
+        "reasoning_73": -4.124999523162842,
+        "reasoning_74": -5.437500476837158,
+        "reasoning_75": -4.2031251937150955,
+        "reasoning_78": 2.125,
+        "reasoning_80": -3.875,
+        "reasoning_100": 1.2877701136469841
+      },
+      "reasoning_drift": -3.895430773496628,
+      "reasoning_drift_phases": [
+        "reasoning_0",
+        "reasoning_100"
+      ],
+      "pre_answer_minus_prompt_last": null,
+      "cue_minus_prompt_last": null,
+      "activation_margin_pearson": 0.27946158234026214,
+      "n_margin_pairs": 86,
+      "fire_rate_per_distinct_position": 0.38372093023255816,
+      "topk_rate_per_distinct_position": 0.38372093023255816,
+      "n_distinct_positions": 86,
+      "n_rows": 108
+    },
+    "thinking": {
+      "phase_means": {
+        "prompt_last": 13.17920313941108,
+        "reasoning_0": 0.0,
+        "reasoning_25": 0.0,
+        "reasoning_50": 0.0,
+        "reasoning_75": 0.0,
+        "reasoning_100": 0.0,
+        "pre_answer": 0.0
+      },
+      "margin_means": {
+        "prompt_last": 2.5741170389163823,
+        "reasoning_0": -0.15588397656877837,
+        "reasoning_25": 1.1711792360163398,
+        "reasoning_50": -0.7895378534578614,
+        "reasoning_75": -1.965020972924928,
+        "reasoning_100": -1.4097044995804835,
+        "pre_answer": -11.752343954906488
+      },
+      "reasoning_drift": 0.0,
+      "reasoning_drift_phases": [
+        "reasoning_0",
+        "reasoning_100"
+      ],
+      "pre_answer_minus_prompt_last": -13.17920313941108,
+      "cue_minus_prompt_last": null,
+      "activation_margin_pearson": 0.3314371350218774,
+      "n_margin_pairs": 108,
+      "fire_rate_per_distinct_position": 0.14814814814814814,
+      "topk_rate_per_distinct_position": 0.14814814814814814,
+      "n_distinct_positions": 108,
+      "n_rows": 111
+    }
+  },
+  "drift_difference": {
+    "modes": [
+      "non_thinking",
+      "thinking"
+    ],
+    "value": 3.895430773496628,
+    "phases": [
+      "reasoning_0",
+      "reasoning_100"
+    ],
+    "note": "thinking minus non_thinking; a positional feature drifts alike in both"
+  }
+}
