@@ -1,0 +1,7 @@
+case_id,family,case_condition,mode,thinking,token_phase,fraction,token_index,span_start,span_end,layer,feature_id,activation,cue_span_mean,is_topk,is_firing,margin_if_readout_available,margin_prefix_tokens,duplicate_of,answer_label,n_tokens,has_think_end,cue_located
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,prompt_last,0.0,86,86,87,55,65825,14.013360023498535,,True,True,3.9375001192092896,87,,lure,89,False,False
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,reasoning_0,0.0,87,87,88,55,65825,0.0,,False,False,-5.062499523162842,88,,lure,89,False,False
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,reasoning_0,0.0,87,87,88,55,65825,0.0,,False,False,-5.062499523162842,88,reasoning_0,lure,89,False,False
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,reasoning_0,0.0,87,87,88,55,65825,0.0,,False,False,-5.062499523162842,88,reasoning_0,lure,89,False,False
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,reasoning_100,1.0,88,88,89,55,65825,0.0,,False,False,1.037109375,89,,lure,89,False,False
+kanghun_lure27b_v1_rome_tomorrow,memo_override,trap,non_thinking,False,reasoning_100,1.0,88,88,89,55,65825,0.0,,False,False,1.037109375,89,reasoning_100,lure,89,False,False
