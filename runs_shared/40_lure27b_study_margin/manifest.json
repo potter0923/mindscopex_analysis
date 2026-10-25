@@ -23,5 +23,84 @@
   "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
   "cuda_available": true,
   "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
-  "git_commit": "69ec85e05a18e0b608283f2a3ffb428bae501ac0"
+  "git_commit": "69ec85e05a18e0b608283f2a3ffb428bae501ac0",
+  "finished_at": "2026-10-25T04:09:20+00:00",
+  "elapsed_seconds": 582.537,
+  "study_feature": {
+    "feature_id": 65825,
+    "layer": 55,
+    "n_cases": 8,
+    "objective": "margin_delta",
+    "mean_hostile_delta": 0.5078349411487579,
+    "mean_control_delta": null,
+    "mean_margin_delta": 0.5078349411487579,
+    "std_margin_delta": 0.33573009955295857,
+    "frac_positive": 0.875,
+    "active_in_cases": 7,
+    "peer_feature_percentile": 1.0,
+    "gaussian_percentile": 1.0,
+    "selection_adjusted_percentile": 1.0,
+    "selection_adjusted_p": 0.0,
+    "select_score": [
+      1.0,
+      1.0,
+      0.6249998410542806
+    ]
+  },
+  "feature_source": "discovered",
+  "results": [
+    {
+      "kind": "phenomenon",
+      "paper_csv": "runs_shared/40_lure27b_study_margin/phenomenon.csv",
+      "png": "runs_shared/40_lure27b_study_margin/phenomenon.png",
+      "dataset": "kanghun_lure27b_v1",
+      "n_cases": 18,
+      "mean_margin": 2.5741170389163823,
+      "frac_lure_preferred": 0.8333333333333334
+    },
+    {
+      "kind": "discover",
+      "paper_csv": "runs_shared/40_lure27b_study_margin/discover_localization.csv",
+      "png": null,
+      "best_feature": {
+        "feature_id": 65825,
+        "layer": 55,
+        "n_cases": 8,
+        "objective": "margin_delta",
+        "mean_hostile_delta": 0.5078349411487579,
+        "mean_control_delta": null,
+        "mean_margin_delta": 0.5078349411487579,
+        "std_margin_delta": 0.33573009955295857,
+        "frac_positive": 0.875,
+        "active_in_cases": 7,
+        "peer_feature_percentile": 1.0,
+        "gaussian_percentile": 1.0,
+        "selection_adjusted_percentile": 1.0,
+        "selection_adjusted_p": 0.0,
+        "select_score": [
+          1.0,
+          1.0,
+          0.6249998410542806
+        ]
+      },
+      "n_train": 12
+    },
+    {
+      "kind": "control_specificity",
+      "paper_csv": "runs_shared/40_lure27b_study_margin/control_specificity.csv",
+      "n_cases": 6,
+      "mean_hostile_delta": 0.2708333730697632,
+      "mean_control_delta": 0.10937493046124776,
+      "mean_specificity_gap": 0.1614584426085154
+    },
+    {
+      "kind": "causal_heldout",
+      "paper_csv": "runs_shared/40_lure27b_study_margin/causal_heldout.csv",
+      "n_test": 6,
+      "objective": "hostile_margin",
+      "mean_margin_delta": 0.2708333730697632,
+      "mean_cue_effect": null,
+      "frac_positive": 0.8333333333333334
+    }
+  ]
 }

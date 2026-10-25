@@ -1,0 +1,7 @@
+case_id,family,feature_value,baseline_margin,edited_margin,margin_delta
+kanghun_lure27b_v1_rome_tomorrow,memo_override,14.0,3.9375001192092896,3.6875,0.25000011920928955
+kanghun_lure27b_v1_eggs_drawer,memo_override,11.8125,2.375,2.125,0.25
+kanghun_lure27b_v1_time_lunch,memo_override,14.25,1.3750001192092896,0.875,0.5000001192092896
+kanghun_lure27b_v1_apple_busy,memo_override,14.125,-0.25,-0.375,0.125
+kanghun_lure27b_v1_humpty_chair,memo_override,13.3125,3.0,2.5,0.5
+kanghun_lure27b_v1_before_tomorrow,non_memo,0.0,-0.1875,-0.1875,0.0
