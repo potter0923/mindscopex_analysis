@@ -193,6 +193,20 @@ def load_qwen_language_model(
     }
     automodel = _qwen35_automodel(model_id)
     if automodel is not None:
+        # Qwen3.5 needs a non-default auto class. Recent NNsight releases accept the
+        # ``automodel`` argument at construction but forward it to the model class
+        # when weights are dispatched lazily, so the failure only appears on first
+        # use. Loading the module ourselves and wrapping it sidesteps that entirely.
+        return _wrap_preloaded(
+            LanguageModel,
+            automodel,
+            model_id,
+            device_map=device_map,
+            dtype=resolved_dtype,
+            trust_remote_code=trust_remote_code,
+            **kwargs,
+        )
+    if automodel is not None:
         base_kwargs["automodel"] = automodel
     if resolved_dtype is not None:
         base_kwargs["torch_dtype"] = resolved_dtype
@@ -222,35 +236,46 @@ def load_qwen_language_model(
         except TypeError as exc:
             errors.append(f"{attempt}: {exc}")
 
-    # Some NNsight releases no longer consume ``automodel`` and pass it straight to
-    # the model constructor, which rejects it. Loading the Transformers model first
-    # and wrapping the module is supported across NNsight versions and keeps the
-    # same module tree (``model.language_model.layers``), so block paths still hold.
-    try:
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-
-        model_class = automodel or AutoModelForCausalLM
-        load_kwargs: dict[str, Any] = {
-            "device_map": device_map,
-            "trust_remote_code": trust_remote_code,
-            **kwargs,
-        }
-        if resolved_dtype is not None:
-            load_kwargs["dtype"] = resolved_dtype
-        try:
-            hf_model = model_class.from_pretrained(model_id, **load_kwargs)
-        except TypeError:
-            if "dtype" in load_kwargs:
-                load_kwargs["torch_dtype"] = load_kwargs.pop("dtype")
-            hf_model = model_class.from_pretrained(model_id, **load_kwargs)
-        hf_model.eval()
-        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
-        return LanguageModel(hf_model, tokenizer=tokenizer)
-    except TypeError as exc:
-        errors.append(f"preloaded-module fallback: {exc}")
-
     joined = "\n".join(errors[-3:])
     raise TypeError(f"Could not load {model_id!r} with NNsight. Last errors:\n{joined}")
+
+
+def _wrap_preloaded(
+    language_model_cls: Any,
+    model_class: Any,
+    model_id: str,
+    *,
+    device_map: str | dict[str, Any],
+    dtype: torch.dtype | None,
+    trust_remote_code: bool,
+    **kwargs: Any,
+) -> Any:
+    """Load a Transformers model eagerly and hand the module to NNsight.
+
+    Wrapping an already-built ``nn.Module`` is supported across NNsight versions and
+    keeps the module tree unchanged (``model.language_model.layers`` for Qwen3.5), so
+    block paths and SAE hooks resolve exactly as when NNsight loads by repo id.
+    """
+
+    from transformers import AutoTokenizer
+
+    load_kwargs: dict[str, Any] = {
+        "device_map": device_map,
+        "trust_remote_code": trust_remote_code,
+        **kwargs,
+    }
+    if dtype is not None:
+        load_kwargs["dtype"] = dtype
+    try:
+        hf_model = model_class.from_pretrained(model_id, **load_kwargs)
+    except TypeError:
+        # Older Transformers spell it torch_dtype.
+        if "dtype" in load_kwargs:
+            load_kwargs["torch_dtype"] = load_kwargs.pop("dtype")
+        hf_model = model_class.from_pretrained(model_id, **load_kwargs)
+    hf_model.eval()
+    tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
+    return language_model_cls(hf_model, tokenizer=tokenizer)
 
 
 def load_qwen_text_generation_model(
