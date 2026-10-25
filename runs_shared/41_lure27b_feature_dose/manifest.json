@@ -1,0 +1,15 @@
+{
+  "job": "feature_dose",
+  "model_id": "Qwen/Qwen3.5-27B",
+  "layer": 55,
+  "feature_id": 65825,
+  "coefficients": [
+    1.0,
+    2.0,
+    4.0,
+    8.0
+  ],
+  "n_train": 12,
+  "n_test": 6,
+  "elapsed_seconds": 463.2
+}
