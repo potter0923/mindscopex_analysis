@@ -222,6 +222,33 @@ def load_qwen_language_model(
         except TypeError as exc:
             errors.append(f"{attempt}: {exc}")
 
+    # Some NNsight releases no longer consume ``automodel`` and pass it straight to
+    # the model constructor, which rejects it. Loading the Transformers model first
+    # and wrapping the module is supported across NNsight versions and keeps the
+    # same module tree (``model.language_model.layers``), so block paths still hold.
+    try:
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        model_class = automodel or AutoModelForCausalLM
+        load_kwargs: dict[str, Any] = {
+            "device_map": device_map,
+            "trust_remote_code": trust_remote_code,
+            **kwargs,
+        }
+        if resolved_dtype is not None:
+            load_kwargs["dtype"] = resolved_dtype
+        try:
+            hf_model = model_class.from_pretrained(model_id, **load_kwargs)
+        except TypeError:
+            if "dtype" in load_kwargs:
+                load_kwargs["torch_dtype"] = load_kwargs.pop("dtype")
+            hf_model = model_class.from_pretrained(model_id, **load_kwargs)
+        hf_model.eval()
+        tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=trust_remote_code)
+        return LanguageModel(hf_model, tokenizer=tokenizer)
+    except TypeError as exc:
+        errors.append(f"preloaded-module fallback: {exc}")
+
     joined = "\n".join(errors[-3:])
     raise TypeError(f"Could not load {model_id!r} with NNsight. Last errors:\n{joined}")
 
