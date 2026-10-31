@@ -1,0 +1,30 @@
+{
+  "job": "thinking_patch",
+  "model_id": "Qwen/Qwen3.5-27B",
+  "traces": "runs_shared/43_lure27b_trajectory_long/traces.json",
+  "n_items": 18,
+  "n_with_on": 18,
+  "n_on_completed": 15,
+  "n_train_completed": 10,
+  "split": {
+    "train": 12,
+    "held_out": 6
+  },
+  "patch_layers": [
+    15,
+    31,
+    47,
+    55,
+    63
+  ],
+  "sae_layers": [
+    47,
+    55
+  ],
+  "steer_layers": [
+    47,
+    55
+  ],
+  "min_gap": 0.5,
+  "elapsed_seconds": 614.0
+}
