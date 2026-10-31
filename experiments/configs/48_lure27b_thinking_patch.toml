@@ -1,0 +1,55 @@
+# Can thinking-off reach thinking-on with an edit at the answer slot?
+# (동준: "off에서 steering을 통해 on 만큼의 성능이 나오는 feature")
+#
+# a. patch the thinking-ON answer-slot residual into thinking-OFF, layer by layer
+#    -> the ceiling for any edit at that layer
+# b. ON - OFF at the answer slot, SAE-decomposed, ranked on the train split only
+# c. thinking-off steering on held-out traps + controls: diffmean (SAE-free),
+#    top-N SAE features set to their ON value, run 41's feature, random directions
+#
+# No generation: the ON contexts are run 43's own greedy traces. Same 12/6 split as
+# runs 40/41 (split_seed 1), so held-out items never rank a feature or build the
+# diffmean vector.
+[run]
+name = "48_lure27b_thinking_patch"
+job = "thinking_patch"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[thinking]
+traces = "runs_shared/43_lure27b_trajectory_long/traces.json"
+
+[patch]
+enabled = true
+layers = [15, 31, 47, 55, 63]
+
+[decompose]
+layers = [47, 55]
+top_n = 64
+
+[steer]
+layers = [47, 55]
+diffmean_alphas = [0.5, 1.0, 2.0]
+sae_top_n = [1, 4, 16, 64]
+random_seeds = [101, 102, 103]
+min_gap = 0.5            # nats; items where thinking moved the margin less get no gap ratio
+
+[pinned]
+layer = 55
+feature_id = 65825
+coefficients = [1, 8]
+
+[colab]
+gpu = "G4"
