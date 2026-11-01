@@ -1,0 +1,50 @@
+{
+  "job": "thinking_direction",
+  "model_id": "Qwen/Qwen3.5-27B",
+  "n_items": 18,
+  "n_completed": 15,
+  "loo_layers": [
+    35,
+    39,
+    43,
+    47,
+    51,
+    55,
+    59
+  ],
+  "alphas": [
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "edit_arms": [
+    [
+      47,
+      2.0
+    ],
+    [
+      47,
+      1.0
+    ],
+    [
+      47,
+      3.0
+    ],
+    [
+      55,
+      2.0
+    ]
+  ],
+  "datasets": [
+    "goal_affordance_traps_v1",
+    "hagendorff_crt",
+    "crt_fresh_v2",
+    "kanghun_traps_v3",
+    "kanghun_traps_v4",
+    "kanghun_traps_v2",
+    "kanghun_traps_v1",
+    "external_traps_v1"
+  ],
+  "elapsed_seconds": 4441.7
+}
