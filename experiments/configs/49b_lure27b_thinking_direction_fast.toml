@@ -1,0 +1,41 @@
+# Fast cut of 49 for a time-boxed run (~45 min on G4): the two layers run 48 found,
+# two strengths, the sanity set, and transfer to the two datasets that matter most
+# (동준's goal-affordance traps and Hagendorff CRT). Same job, same resume logic.
+[run]
+name = "49b_lure27b_thinking_direction_fast"
+job = "thinking_direction"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[thinking]
+traces = "runs_shared/43_lure27b_trajectory_long/traces.json"
+
+[loo]
+layers = [47, 55]
+alphas = [1.0, 2.0]
+random_seeds = [101, 102, 103]
+random_alpha = 2.0
+min_gap = 0.5
+
+[sanity]
+generate_tokens = 30
+
+[transfer]
+arms = [[47, 2.0]]
+random_seeds = [101]
+datasets = ["goal_affordance_traps_v1", "hagendorff_crt"]
+
+[colab]
+gpu = "G4"
