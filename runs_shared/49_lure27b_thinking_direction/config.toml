@@ -1,0 +1,58 @@
+# Follow-up to 48: how far does the thinking direction (mean ON - OFF residual at
+# the answer slot) go?
+#
+# 1. leave-one-out on all 18 lure27b items (direction from the other items), several
+#    layers and strengths, matched-norm random directions; traps + controls
+# 2. sanity: 30 plain questions whose obvious answer is right, + free-generation text
+# 3. transfer: the all-item direction on other datasets, thinking off, forced choice
+#
+# Rows are appended as produced; a rerun skips finished rows (resume after a VM
+# recycle). Expected ~2 h on G4.
+[run]
+name = "49_lure27b_thinking_direction"
+job = "thinking_direction"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v1"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[thinking]
+traces = "runs_shared/43_lure27b_trajectory_long/traces.json"
+
+[loo]
+layers = [35, 39, 43, 47, 51, 55, 59]
+alphas = [1.0, 1.5, 2.0, 3.0]
+random_seeds = [101, 102, 103]
+random_alpha = 2.0
+min_gap = 0.5
+
+[sanity]
+generate_tokens = 40
+
+[transfer]
+# [layer, alpha]; the first entry also sets the random-direction control's norm
+arms = [[47, 2.0], [47, 1.0], [47, 3.0], [55, 2.0]]
+random_seeds = [101, 102]
+datasets = [
+  "goal_affordance_traps_v1",
+  "hagendorff_crt",
+  "crt_fresh_v2",
+  "kanghun_traps_v3",
+  "kanghun_traps_v4",
+  "kanghun_traps_v2",
+  "kanghun_traps_v1",
+  "external_traps_v1",
+]
+
+[colab]
+gpu = "G4"
