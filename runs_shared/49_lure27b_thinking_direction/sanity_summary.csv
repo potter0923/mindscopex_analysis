@@ -1,0 +1,8 @@
+kind,arm,layer,alpha,n,correct,lure_to_correct,correct_to_lure,mean_gap_closure
+sanity,global_dir,47,1.0,30,30,0,0,
+sanity,global_dir,47,2.0,30,30,0,0,
+sanity,global_dir,47,3.0,30,30,0,0,
+sanity,global_dir,55,2.0,30,30,0,0,
+sanity,none,0,0.0,30,30,0,0,
+sanity,random101,47,2.0,30,30,0,0,
+sanity,random102,47,2.0,30,30,0,0,

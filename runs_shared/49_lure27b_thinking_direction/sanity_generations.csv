@@ -1,0 +1,227 @@
+item,arm,layer,alpha,text
+fact_capital_france,none,0,0.0,Paris
+fact_capital_france,global_dir,47,2.0,Paris
+fact_capital_france,global_dir,47,1.0,Paris
+fact_capital_france,global_dir,47,3.0,Paris
+fact_capital_france,global_dir,55,2.0,Paris
+fact_capital_france,random101,47,2.0,Paris
+fact_capital_france,random102,47,2.0,Paris
+fact_capital_japan,none,0,0.0,Tokyo
+fact_capital_japan,global_dir,47,2.0,Tokyo
+fact_capital_japan,global_dir,47,1.0,Tokyo
+fact_capital_japan,global_dir,47,3.0,Tokyo
+fact_capital_japan,global_dir,55,2.0,Tokyo
+fact_capital_japan,random101,47,2.0,Tokyo
+fact_capital_japan,random102,47,2.0,Tokyo
+fact_capital_italy,none,0,0.0,Rome
+fact_capital_italy,global_dir,47,2.0,Rome
+fact_capital_italy,global_dir,47,1.0,Rome
+fact_capital_italy,global_dir,47,3.0,Rome
+fact_capital_italy,global_dir,55,2.0,"<think>
+
+</think>
+
+Rome"
+fact_capital_italy,random101,47,2.0,Rome
+fact_capital_italy,random102,47,2.0,Rome
+fact_spider_legs,none,0,0.0,8 legs
+fact_spider_legs,global_dir,47,2.0,8
+fact_spider_legs,global_dir,47,1.0,8 legs
+fact_spider_legs,global_dir,47,3.0,8
+fact_spider_legs,global_dir,55,2.0,8 legs
+fact_spider_legs,random101,47,2.0,8 legs
+fact_spider_legs,random102,47,2.0,8 legs
+fact_week_days,none,0,0.0,7 days
+fact_week_days,global_dir,47,2.0,7 days
+fact_week_days,global_dir,47,1.0,7 days
+fact_week_days,global_dir,47,3.0,7 days
+fact_week_days,global_dir,55,2.0,7 days
+fact_week_days,random101,47,2.0,7 days
+fact_week_days,random102,47,2.0,7 days
+fact_sky,none,0,0.0,Blue
+fact_sky,global_dir,47,2.0,Blue
+fact_sky,global_dir,47,1.0,Blue
+fact_sky,global_dir,47,3.0,blue
+fact_sky,global_dir,55,2.0,blue
+fact_sky,random101,47,2.0,Blue
+fact_sky,random102,47,2.0,Blue
+fact_water_freeze,none,0,0.0,0°C
+fact_water_freeze,global_dir,47,2.0,0°C
+fact_water_freeze,global_dir,47,1.0,0°C
+fact_water_freeze,global_dir,47,3.0,0°C
+fact_water_freeze,global_dir,55,2.0,0°C
+fact_water_freeze,random101,47,2.0,0°C
+fact_water_freeze,random102,47,2.0,0°C
+fact_planet_red,none,0,0.0,Mars
+fact_planet_red,global_dir,47,2.0,Mars
+fact_planet_red,global_dir,47,1.0,Mars
+fact_planet_red,global_dir,47,3.0,Mars
+fact_planet_red,global_dir,55,2.0,"<think>
+
+</think>
+
+Mars"
+fact_planet_red,random101,47,2.0,Mars
+fact_planet_red,random102,47,2.0,Mars
+fact_largest_ocean,none,0,0.0,Pacific Ocean
+fact_largest_ocean,global_dir,47,2.0,Pacific Ocean
+fact_largest_ocean,global_dir,47,1.0,Pacific Ocean
+fact_largest_ocean,global_dir,47,3.0,Pacific Ocean
+fact_largest_ocean,global_dir,55,2.0,Pacific Ocean
+fact_largest_ocean,random101,47,2.0,Pacific Ocean
+fact_largest_ocean,random102,47,2.0,Pacific Ocean
+fact_author_hamlet,none,0,0.0,William Shakespeare
+fact_author_hamlet,global_dir,47,2.0,William Shakespeare
+fact_author_hamlet,global_dir,47,1.0,William Shakespeare
+fact_author_hamlet,global_dir,47,3.0,William Shakespeare
+fact_author_hamlet,global_dir,55,2.0,William Shakespeare
+fact_author_hamlet,random101,47,2.0,William Shakespeare
+fact_author_hamlet,random102,47,2.0,William Shakespeare
+fact_ice,none,0,0.0,ice
+fact_ice,global_dir,47,2.0,Ice
+fact_ice,global_dir,47,1.0,ice
+fact_ice,global_dir,47,3.0,Ice
+fact_ice,global_dir,55,2.0,frozen water is called ice.
+fact_ice,random101,47,2.0,ice
+fact_ice,random102,47,2.0,Ice
+fact_opposite_hot,none,0,0.0,cold
+fact_opposite_hot,global_dir,47,2.0,cold
+fact_opposite_hot,global_dir,47,1.0,cold
+fact_opposite_hot,global_dir,47,3.0,hot
+fact_opposite_hot,global_dir,55,2.0,cold
+fact_opposite_hot,random101,47,2.0,cold
+fact_opposite_hot,random102,47,2.0,cold
+fact_opposite_up,none,0,0.0,down
+fact_opposite_up,global_dir,47,2.0,down
+fact_opposite_up,global_dir,47,1.0,down
+fact_opposite_up,global_dir,47,3.0,down
+fact_opposite_up,global_dir,55,2.0,down
+fact_opposite_up,random101,47,2.0,down
+fact_opposite_up,random102,47,2.0,down
+fact_baby_cat,none,0,0.0,A baby cat is called a kitten.
+fact_baby_cat,global_dir,47,2.0,kitten
+fact_baby_cat,global_dir,47,1.0,kitten
+fact_baby_cat,global_dir,47,3.0,kitten
+fact_baby_cat,global_dir,55,2.0,baby cat is called a kitten
+fact_baby_cat,random101,47,2.0,kitten
+fact_baby_cat,random102,47,2.0,kitten
+fact_bees,none,0,0.0,Answer: Bee
+fact_bees,global_dir,47,2.0,Honey bee
+fact_bees,global_dir,47,1.0,bee
+fact_bees,global_dir,47,3.0,Answer: Bee
+fact_bees,global_dir,55,2.0,bee
+fact_bees,random101,47,2.0,Answer: Bee
+fact_bees,random102,47,2.0,Honeybee
+math_add,none,0,0.0,12
+math_add,global_dir,47,2.0,7 + 5 = 12
+math_add,global_dir,47,1.0,12
+math_add,global_dir,47,3.0,7 + 5 = 12
+math_add,global_dir,55,2.0,12
+math_add,random101,47,2.0,12
+math_add,random102,47,2.0,12
+math_mul,none,0,0.0,24
+math_mul,global_dir,47,2.0,6 x 4 = 24
+math_mul,global_dir,47,1.0,24
+math_mul,global_dir,47,3.0,6 x 4 = 24
+math_mul,global_dir,55,2.0,24
+math_mul,random101,47,2.0,24
+math_mul,random102,47,2.0,24
+math_sub,none,0,0.0,6
+math_sub,global_dir,47,2.0,6
+math_sub,global_dir,47,1.0,6
+math_sub,global_dir,47,3.0,6
+math_sub,global_dir,55,2.0,6
+math_sub,random101,47,2.0,6
+math_sub,random102,47,2.0,6
+math_div,none,0,0.0,5
+math_div,global_dir,47,2.0,20 divided by 4 is 5.
+math_div,global_dir,47,1.0,5
+math_div,global_dir,47,3.0,20 divided by 4 is 5.
+math_div,global_dir,55,2.0,20 divided by 4 is 5.
+math_div,random101,47,2.0,5
+math_div,random102,47,2.0,5
+math_sq,none,0,0.0,81
+math_sq,global_dir,47,2.0,9 squared is 81.
+math_sq,global_dir,47,1.0,81
+math_sq,global_dir,47,3.0,9 squared is 81.
+math_sq,global_dir,55,2.0,81
+math_sq,random101,47,2.0,81
+math_sq,random102,47,2.0,81
+seq_letters,none,0,0.0,D
+seq_letters,global_dir,47,2.0,D
+seq_letters,global_dir,47,1.0,D
+seq_letters,global_dir,47,3.0,D
+seq_letters,global_dir,55,2.0,D
+seq_letters,random101,47,2.0,D
+seq_letters,random102,47,2.0,D
+seq_count,none,0,0.0,100
+seq_count,global_dir,47,2.0,100
+seq_count,global_dir,47,1.0,100
+seq_count,global_dir,47,3.0,100
+seq_count,global_dir,55,2.0,100
+seq_count,random101,47,2.0,100
+seq_count,random102,47,2.0,100
+say_late,none,0,0.0,Better late than never
+say_late,global_dir,47,2.0,Better late than never
+say_late,global_dir,47,1.0,Better late than never
+say_late,global_dir,47,3.0,Better late than never
+say_late,global_dir,55,2.0,better late than never
+say_late,random101,47,2.0,Better late than never
+say_late,random102,47,2.0,Better late than never
+say_eggs,none,0,0.0,basket
+say_eggs,global_dir,47,2.0,basket
+say_eggs,global_dir,47,1.0,basket
+say_eggs,global_dir,47,3.0,Answer: basket
+say_eggs,global_dir,55,2.0,basket
+say_eggs,random101,47,2.0,basket
+say_eggs,random102,47,2.0,basket
+say_bird,none,0,0.0,The early bird catches the worm.
+say_bird,global_dir,47,2.0,The early bird catches the worm.
+say_bird,global_dir,47,1.0,worm
+say_bird,global_dir,47,3.0,The early bird catches the worm.
+say_bird,global_dir,55,2.0,the early bird catches the worm
+say_bird,random101,47,2.0,worm
+say_bird,random102,47,2.0,The early bird catches the worm.
+say_rome,none,0,0.0,day
+say_rome,global_dir,47,2.0,day
+say_rome,global_dir,47,1.0,day
+say_rome,global_dir,47,3.0,Rome wasn't built in a day
+say_rome,global_dir,55,2.0,"<think>
+
+</think>
+
+day"
+say_rome,random101,47,2.0,day
+say_rome,random102,47,2.0,day
+say_apple,none,0,0.0,An apple a day keeps the doctor away.
+say_apple,global_dir,47,2.0,An apple a day keeps the doctor away.
+say_apple,global_dir,47,1.0,doctor away
+say_apple,global_dir,47,3.0,An apple a day keeps the doctor away.
+say_apple,global_dir,55,2.0,"<think>
+
+</think>
+
+doctor away"
+say_apple,random101,47,2.0,doctor away
+say_apple,random102,47,2.0,doctor away
+say_cat,none,0,0.0,cat
+say_cat,global_dir,47,2.0,Curiosity killed the cat
+say_cat,global_dir,47,1.0,cat
+say_cat,global_dir,47,3.0,Curiosity killed the cat
+say_cat,global_dir,55,2.0,curiosity killed the cat
+say_cat,random101,47,2.0,cat
+say_cat,random102,47,2.0,cat
+instr_word,none,0,0.0,Cow
+instr_word,global_dir,47,2.0,Cow
+instr_word,global_dir,47,1.0,Cow
+instr_word,global_dir,47,3.0,Cow
+instr_word,global_dir,55,2.0,cow
+instr_word,random101,47,2.0,Cow
+instr_word,random102,47,2.0,Cow
+instr_number,none,0,0.0,2
+instr_number,global_dir,47,2.0,2
+instr_number,global_dir,47,1.0,2
+instr_number,global_dir,47,3.0,2
+instr_number,global_dir,55,2.0,2
+instr_number,random101,47,2.0,2
+instr_number,random102,47,2.0,2
