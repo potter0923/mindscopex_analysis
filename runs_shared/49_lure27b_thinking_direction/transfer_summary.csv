@@ -1,0 +1,8 @@
+dataset,kind,arm,layer,alpha,n,correct,lure_to_correct,correct_to_lure,mean_gap_closure
+goal_affordance_traps_v1,trap,global_dir,47,1.0,240,143,2,9,
+goal_affordance_traps_v1,trap,global_dir,47,2.0,240,141,9,18,
+goal_affordance_traps_v1,trap,global_dir,47,3.0,240,138,11,23,
+goal_affordance_traps_v1,trap,global_dir,55,2.0,240,155,12,7,
+goal_affordance_traps_v1,trap,none,0,0.0,240,150,0,0,
+goal_affordance_traps_v1,trap,random101,47,2.0,240,146,5,9,
+goal_affordance_traps_v1,trap,random102,47,2.0,240,151,8,7,
