@@ -1,0 +1,32 @@
+[
+  {
+    "model_id": "Qwen/Qwen3.5-27B",
+    "case_id": "kanghun_traps_v5_strawberry_r",
+    "family": "letter_count",
+    "enable_thinking": false,
+    "prompt": "How many times does the letter 'r' appear in the word 'strawberry'?\nAnswer:",
+    "correct_answer": "3",
+    "lure_answer": "2",
+    "raw_text": "3",
+    "thinking": "",
+    "answer": "3",
+    "answer_label": "correct",
+    "input_tokens": 102,
+    "output_tokens": 1,
+    "elapsed_seconds": 2.077572263000093,
+    "seed": 42,
+    "hit_max_tokens": false,
+    "generation_attempts": 1,
+    "retry_reasons": [],
+    "attempt_history": [],
+    "thinking_completed": null,
+    "mode": "non_thinking",
+    "has_thinking_block": false,
+    "reasoning_detected": false,
+    "thinking_protocol_ok": true,
+    "thinking_protocol_issue": null,
+    "final_answer_format_ok": true,
+    "final_answer_format_issue": null,
+    "evaluation_label": "correct"
+  }
+]

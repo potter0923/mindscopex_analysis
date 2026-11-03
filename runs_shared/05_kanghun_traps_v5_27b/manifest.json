@@ -1,0 +1,33 @@
+{
+  "run_name": "05_kanghun_traps_v5_27b",
+  "job": "crt_text_responses",
+  "started_at": "2026-11-03T04:48:35+00:00",
+  "config_path": "experiments/configs/05_kanghun_traps_v5_27b.toml",
+  "output_dir": "runs_shared/05_kanghun_traps_v5_27b",
+  "dataset": "kanghun_traps_v5",
+  "dataset_preset": "id:kanghun_traps_v5",
+  "dataset_reference": "kanghun_traps_v5",
+  "n_cases": 96,
+  "model_ids": [
+    "Qwen/Qwen3.5-27B"
+  ],
+  "seeds": [
+    42
+  ],
+  "thinking_modes": [
+    false,
+    true
+  ],
+  "generation_protocol": "qwen_native",
+  "output_mode": "binary_choice",
+  "max_new_tokens": 2048,
+  "max_retries": 2,
+  "dtype": "bfloat16",
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "cuda_available": true,
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "git_commit": "74f68b3ededac148ecae718bf1b39b533232a050",
+  "git_status": "?? runs_shared/05_kanghun_traps_v5_27b/",
+  "resumed_with": 0
+}
