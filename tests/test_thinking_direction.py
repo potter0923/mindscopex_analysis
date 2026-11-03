@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.jobs.thinking_direction import RowLog, count_table, leave_one_out_means
+from experiments.jobs.thinking_direction import RowLog, _truthy, count_table, leave_one_out_means
 
 
 class LeaveOneOutTests(unittest.TestCase):
@@ -34,6 +34,15 @@ class CountTableTests(unittest.TestCase):
         self.assertEqual(by_arm["d"]["correct"], 2)
         self.assertEqual(by_arm["d"]["lure_to_correct"], 1)  # z was already right
         self.assertEqual(by_arm["d"]["correct_to_lure"], 1)
+
+
+class TruthyTests(unittest.TestCase):
+    def test_csv_and_json_spellings(self) -> None:
+        self.assertTrue(_truthy(True))
+        self.assertTrue(_truthy("True"))
+        self.assertFalse(_truthy(False))
+        self.assertFalse(_truthy("False"))
+        self.assertFalse(_truthy(""))
 
 
 class RowLogTests(unittest.TestCase):

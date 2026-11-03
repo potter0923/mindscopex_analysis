@@ -1,0 +1,31 @@
+# v5: eight trap families not tried in v1-v4, on Qwen3.5-27B.
+# Same protocol as 01_-04_ (reasoning OFF/ON, forced correct-vs-lure, controls on).
+# One seed first: the thinking-off answer is deterministic across seeds, so the
+# screen's job is to find which families fire at all; replication comes after.
+[run]
+name = "05_kanghun_traps_v5_27b"
+job = "crt_text_responses"
+
+[dataset]
+id = "kanghun_traps_v5"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"

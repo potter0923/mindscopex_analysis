@@ -19,6 +19,7 @@ while true; do
     git add "$1"
     if git -c user.name="이강훈" -c user.email="kanghun@sk.com" \
         commit -qm "Checkpoint $(basename "$1") ($(date -u +%H:%M))"; then
+      git pull --rebase --autostash -q || git rebase --abort
       git push -q && echo "$(date -u +%H:%M) pushed" || echo "$(date -u +%H:%M) push failed"
     fi
   ' _ "$DEST"

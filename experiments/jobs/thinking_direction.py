@@ -122,6 +122,10 @@ def leave_one_out_means(diffs: Mapping[str, Any], *, include: Iterable[str]) -> 
     return out
 
 
+def _truthy(value: Any) -> bool:
+    return str(value).strip().lower() not in {"0", "false", "no", ""}
+
+
 def row_key(row: Mapping[str, Any], keys: Sequence[str]) -> tuple[str, ...]:
     return tuple(str(row.get(k, "")) for k in keys)
 
@@ -259,6 +263,9 @@ def run(config_path: Path, output_root: Path) -> Path:
     xrandom = [int(x) for x in xcfg.get("random_seeds", [101])]
     datasets = [str(x) for x in xcfg.get("datasets", [])]
     gen_tokens = int(scfg.get("generate_tokens", 40))
+    family_scope = bool(lcfg.get("family_scope", False))
+    external_path = str(lcfg.get("external_directions", "") or "")
+    external_alphas = [float(x) for x in lcfg.get("external_alphas", alphas)]
 
     env = _resolve_env(config)
     splits = _load_splits(config)
@@ -312,6 +319,8 @@ def run(config_path: Path, output_root: Path) -> Path:
         item["off_margin"] = runner.margin(off_ids, item["cor"], item["lur"])
         if trace is not None and tail is not None:
             on_ids, completed = runner.on_context(case.prompt, trace["raw_text"], tail)
+            # Screen traces close a budget-capped thought by force; their own flag says so.
+            completed = completed and _truthy(trace.get("thinking_completed", True))
             item["on_cap"] = runner.capture(on_ids, all_layers, 1)
             item["on_margin"] = runner.margin(on_ids, item["cor"], item["lur"])
             item["on_completed"] = completed
@@ -325,7 +334,10 @@ def run(config_path: Path, output_root: Path) -> Path:
     completed_ids = [k for k, it in items.items() if it.get("on_completed")]
     _log(f"[{time.time() - started:5.0f}s] captured {len(items)} items, {len(completed_ids)} done")
 
+    if not completed_ids:
+        raise RuntimeError("no finished thinking trace: cannot build a direction")
     directions: dict[int, dict[str, Any]] = {}
+    family_dirs: dict[int, dict[str, Any]] = {}
     global_dir: dict[int, Any] = {}
     for layer in all_layers:
         diffs = {
@@ -335,6 +347,19 @@ def run(config_path: Path, output_root: Path) -> Path:
         }
         directions[layer] = leave_one_out_means(diffs, include=completed_ids)
         global_dir[layer] = torch.stack([diffs[k] for k in completed_ids]).mean(0)
+        family_dirs[layer] = {}
+        if family_scope:
+            for family in sorted({it["case"].family for it in items.values()}):
+                members = {k: v for k, v in diffs.items() if items[k]["case"].family == family}
+                family_dirs[layer].update(
+                    leave_one_out_means(members, include=[k for k in completed_ids if k in members])
+                )
+    external: dict[int, Any] = {}
+    if external_path:
+        external = {
+            int(k): v.float()
+            for k, v in torch.load(ROOT / external_path, map_location="cpu").items()
+        }
     torch.save(
         {layer: vec.clone() for layer, vec in global_dir.items()}, run_dir / "global_directions.pt"
     )
@@ -356,6 +381,11 @@ def run(config_path: Path, output_root: Path) -> Path:
                 )
                 arms = [("none", 0.0, None)]
                 arms += [("loo_dir", a, a * vec) for a in alphas]
+                fam_vec = family_dirs[layer].get(key)
+                if fam_vec is not None:
+                    arms += [("family_dir", a, a * fam_vec) for a in alphas]
+                if layer in external:
+                    arms += [("external_dir", a, a * external[layer]) for a in external_alphas]
                 arms += [
                     (f"random{s}", random_alpha, _random_like(vec, s, vec.norm() * random_alpha))
                     for s in random_seeds
@@ -374,6 +404,8 @@ def run(config_path: Path, output_root: Path) -> Path:
                         arm=arm,
                         alpha=alpha,
                     )
+                    if row is not None:
+                        row["family"] = it["case"].family
                     if row is not None and kind == "trap" and "on_margin" in it:
                         row["on_completed"] = it["on_completed"]
                         row["gap_closure"] = gap_closure(
@@ -383,6 +415,10 @@ def run(config_path: Path, output_root: Path) -> Path:
         _log(f"[{time.time() - started:5.0f}s] loo layer {layer} done")
     _write_csv(
         run_dir / "loo_summary.csv", count_table(loo.rows, ["layer", "kind", "arm", "alpha"])
+    )
+    _write_csv(
+        run_dir / "loo_family_summary.csv",
+        count_table(loo.rows, ["layer", "family", "kind", "arm", "alpha"]),
     )
 
     # ------------------------------------------------------------ 2. sanity
@@ -513,6 +549,17 @@ def run(config_path: Path, output_root: Path) -> Path:
             f"correct={r['correct']}/{r['n']} fix={r['lure_to_correct']} "
             f"damage={r['correct_to_lure']} gap={r['mean_gap_closure']}"
         )
+    print("\n== loo by family (alpha 2)")
+    for r in count_table(loo.rows, ["layer", "family", "kind", "arm", "alpha"]):
+        if (
+            r["kind"] == "trap"
+            and str(r["alpha"]) in ("0.0", "2.0")
+            and not r["arm"].startswith("random")
+        ):
+            print(
+                f"  L{r['layer']:<3} {r['family'][:20]:20s} {r['arm']:12s} a={r['alpha']:<4} "
+                f"correct={r['correct']}/{r['n']} fix={r['lure_to_correct']}"
+            )
     print("\n== sanity")
     for r in count_table(sanity.rows, ["kind", "arm", "layer", "alpha"]):
         print(

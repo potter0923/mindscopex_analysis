@@ -1,0 +1,49 @@
+# The run-49 method on the new families (kanghun_lure27b_v2, built from the v5 screen).
+#
+# Three directions per item, all leave-one-out (the item never builds its own):
+#   loo_dir       mean (ON - OFF) over every other new-family item
+#   family_dir    mean over the other items of the *same* family only
+#   external_dir  run 49's direction, built from the memorised-phrase items (v1)
+# If family_dir works and external_dir does not, each family has its own direction.
+# Thinking-on traces come from the screen itself (no second generation pass).
+[run]
+name = "50_lure27b_v2_direction"
+job = "thinking_direction"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v2"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[thinking]
+traces = "runs_shared/05_kanghun_traps_v5_27b/lure27b_v2_traces.json"
+
+[loo]
+layers = [47, 51, 55]
+alphas = [1.0, 2.0, 3.0]
+random_seeds = [101, 102, 103]
+random_alpha = 2.0
+min_gap = 0.5
+family_scope = true
+external_directions = "runs_shared/49_lure27b_thinking_direction/global_directions.pt"
+external_alphas = [1.0, 2.0, 3.0]
+
+[sanity]
+generate_tokens = 20
+
+[transfer]
+arms = [[51, 2.0], [55, 2.0]]
+random_seeds = [101]
+datasets = []
+
+[colab]
+gpu = "G4"
