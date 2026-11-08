@@ -1,0 +1,33 @@
+{
+  "job": "thinking_direction",
+  "model_id": "Qwen/Qwen3.5-27B",
+  "n_items": 16,
+  "n_completed": 10,
+  "loo_layers": [
+    43,
+    47,
+    51,
+    55
+  ],
+  "alphas": [
+    1.0,
+    1.5,
+    2.0,
+    3.0
+  ],
+  "edit_arms": [
+    [
+      47,
+      2.0
+    ],
+    [
+      51,
+      2.0
+    ]
+  ],
+  "datasets": [
+    "kanghun_lure27b_v1",
+    "hagendorff_crt"
+  ],
+  "elapsed_seconds": 966.9
+}

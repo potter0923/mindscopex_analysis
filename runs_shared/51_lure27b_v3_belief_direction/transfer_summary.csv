@@ -1,4 +1,12 @@
 dataset,kind,arm,layer,alpha,n,correct,lure_to_correct,correct_to_lure,mean_gap_closure
+hagendorff_crt,control,global_dir,47,2.0,150,111,4,1,
+hagendorff_crt,control,global_dir,51,2.0,150,110,3,1,
+hagendorff_crt,control,none,0,0.0,150,108,0,0,
+hagendorff_crt,control,random101,47,2.0,150,107,2,3,
+hagendorff_crt,trap,global_dir,47,2.0,150,133,0,16,
+hagendorff_crt,trap,global_dir,51,2.0,150,142,0,7,
+hagendorff_crt,trap,none,0,0.0,150,149,0,0,
+hagendorff_crt,trap,random101,47,2.0,150,132,0,17,
 kanghun_lure27b_v1,control,global_dir,47,2.0,18,18,0,0,
 kanghun_lure27b_v1,control,global_dir,51,2.0,18,18,0,0,
 kanghun_lure27b_v1,control,none,0,0.0,18,18,0,0,
