@@ -29,5 +29,18 @@
   "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
   "git_commit": "b27778cf8a3d1d086c011d76f0b9458f4c8557cb",
   "git_status": "",
-  "resumed_with": 115
+  "resumed_with": 115,
+  "finished_at": "2026-11-08T05:26:50+00:00",
+  "elapsed_seconds": 2592.944,
+  "n_responses": 192,
+  "artifacts": {
+    "responses": "runs_shared/05_kanghun_traps_v5_27b/responses.json",
+    "summary_markdown": "runs_shared/05_kanghun_traps_v5_27b/summary.md",
+    "summary_json": "runs_shared/05_kanghun_traps_v5_27b/summary.json",
+    "family_summary_json": "runs_shared/05_kanghun_traps_v5_27b/family_summary.json",
+    "figures": [
+      "runs_shared/05_kanghun_traps_v5_27b/figures/headline_accuracy.png",
+      "runs_shared/05_kanghun_traps_v5_27b/figures/family_lure_rate.png"
+    ]
+  }
 }

@@ -1,0 +1,9 @@
+family,pairs,trap_lure_rate_off,trap_lure_rate_on,pass
+belief_tracking,6,0.667,0.0,4
+distinct_count,6,0.0,0.0,0
+fact_tweak,6,0.0,0.0,0
+last_letter_concat,6,0.0,0.0,0
+letter_count,6,0.0,0.0,0
+nested_relative,6,0.167,0.0,1
+repeated_word,6,0.0,0.0,0
+sequence_skip,6,0.0,0.0,0

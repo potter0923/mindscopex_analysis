@@ -1,0 +1,84 @@
+{
+  "dataset_id": "kanghun_lure27b_v2",
+  "schema_version": 2,
+  "title": "27B lure set v2 (new families, screened)",
+  "description": "kanghun_traps_v5 pairs that Qwen3.5-27B answered with the lure when thinking was off and correctly when it was on, with the matched control correct both ways, on every screened seed. Copied verbatim; family kept.",
+  "task_kind": "reasoning_lure",
+  "scoring": "logprob_margin",
+  "source": {
+    "authors": "Lee Kanghun (MindScopeX), LLM-assisted",
+    "year": 2026,
+    "title": "27B lure set v2",
+    "venue": "Repository-authored set, screened on Qwen3.5-27B",
+    "doi": "",
+    "project_url": ""
+  },
+  "generated_by": "scripts/build_kanghun_lure27b_v2.py",
+  "n_cases": 5,
+  "family_counts": {
+    "belief_tracking": 4,
+    "nested_relative": 1
+  },
+  "cases": [
+    {
+      "case_id": "kanghun_lure27b_v2_year_before_after_next",
+      "pair_id": "year_before_after_next",
+      "template_id": "nested_relative",
+      "condition": "trap",
+      "family": "nested_relative",
+      "question": "This year is 2026. Which year is ten years before the year after next?",
+      "correct_answer": "2018",
+      "lure_answer": "2016",
+      "control_question": "This year is 2026. Which year was ten years before this year?",
+      "note": "[kanghun_traps_v5:nested_relative] The year after next is 2028; ten years before that is 2018."
+    },
+    {
+      "case_id": "kanghun_lure27b_v2_ball_watched",
+      "pair_id": "ball_watched",
+      "template_id": "belief_tracking",
+      "condition": "trap",
+      "family": "belief_tracking",
+      "question": "Sam puts his ball in the red box and goes outside. While Sam watches through the window, Ana moves the ball to the blue box. Sam comes back in. Where will Sam look for the ball first?",
+      "correct_answer": "the blue box",
+      "lure_answer": "the red box",
+      "control_question": "Sam puts his ball in the red box and goes outside. While Sam is away and cannot see, Ana moves the ball to the blue box. Sam comes back in. Where will Sam look for the ball first?",
+      "note": "[kanghun_traps_v5:belief_tracking] Sam saw the move, so he knows the ball is in the blue box."
+    },
+    {
+      "case_id": "kanghun_lure27b_v2_coin_present",
+      "pair_id": "coin_present",
+      "template_id": "belief_tracking",
+      "condition": "trap",
+      "family": "belief_tracking",
+      "question": "Max hides a coin under the cup. His sister moves the coin under the plate while Max sits right next to her and watches. Where does Max think the coin is?",
+      "correct_answer": "the plate",
+      "lure_answer": "the cup",
+      "control_question": "Max hides a coin under the cup. His sister moves the coin under the plate while Max is asleep. Where does Max think the coin is?",
+      "note": "[kanghun_traps_v5:belief_tracking] Max watched the move."
+    },
+    {
+      "case_id": "kanghun_lure27b_v2_milk_phone",
+      "pair_id": "milk_phone",
+      "template_id": "belief_tracking",
+      "condition": "trap",
+      "family": "belief_tracking",
+      "question": "Emma puts the milk in the fridge and leaves for school. Her dad moves it to the shelf, then calls Emma and tells her the milk is on the shelf now. When Emma gets home, where does she expect the milk to be?",
+      "correct_answer": "the shelf",
+      "lure_answer": "the fridge",
+      "control_question": "Emma puts the milk in the fridge and leaves for school. Her dad moves it to the shelf and does not tell anyone. When Emma gets home, where does she expect the milk to be?",
+      "note": "[kanghun_traps_v5:belief_tracking] Emma was told about the move."
+    },
+    {
+      "case_id": "kanghun_lure27b_v2_toy_told",
+      "pair_id": "toy_told",
+      "template_id": "belief_tracking",
+      "condition": "trap",
+      "family": "belief_tracking",
+      "question": "Mia puts her toy in the basket and leaves the room. Leo moves the toy to the box. When Mia comes back, Leo tells her, 'I moved your toy to the box.' Where will Mia look for her toy first?",
+      "correct_answer": "the box",
+      "lure_answer": "the basket",
+      "control_question": "Mia puts her toy in the basket and leaves the room. Leo moves the toy to the box. Mia comes back and nobody tells her anything. Where will Mia look for her toy first?",
+      "note": "[kanghun_traps_v5:belief_tracking] Leo told Mia about the move."
+    }
+  ]
+}
