@@ -1,0 +1,121 @@
+item,arm,layer,alpha,text
+fact_capital_france,none,0,0.0,Paris
+fact_capital_france,global_dir,51,2.0,Paris
+fact_capital_france,global_dir,55,2.0,Paris
+fact_capital_france,random101,51,2.0,Paris
+fact_capital_japan,none,0,0.0,Tokyo
+fact_capital_japan,global_dir,51,2.0,Tokyo
+fact_capital_japan,global_dir,55,2.0,The capital of Japan is Tokyo.
+fact_capital_japan,random101,51,2.0,Tokyo
+fact_capital_italy,none,0,0.0,Rome
+fact_capital_italy,global_dir,51,2.0,Rome
+fact_capital_italy,global_dir,55,2.0,The capital of Italy is Rome.
+fact_capital_italy,random101,51,2.0,Rome
+fact_spider_legs,none,0,0.0,8 legs
+fact_spider_legs,global_dir,51,2.0,8 legs
+fact_spider_legs,global_dir,55,2.0,8 legs
+fact_spider_legs,random101,51,2.0,8 legs
+fact_week_days,none,0,0.0,7 days
+fact_week_days,global_dir,51,2.0,7 days
+fact_week_days,global_dir,55,2.0,7 days
+fact_week_days,random101,51,2.0,7 days
+fact_sky,none,0,0.0,Blue
+fact_sky,global_dir,51,2.0,Blue
+fact_sky,global_dir,55,2.0,The sky is blue.
+fact_sky,random101,51,2.0,Blue
+fact_water_freeze,none,0,0.0,0°C
+fact_water_freeze,global_dir,51,2.0,0°C
+fact_water_freeze,global_dir,55,2.0,0°C
+fact_water_freeze,random101,51,2.0,0°C
+fact_planet_red,none,0,0.0,Mars
+fact_planet_red,global_dir,51,2.0,Mars
+fact_planet_red,global_dir,55,2.0,The Red Planet is Mars.
+fact_planet_red,random101,51,2.0,Mars
+fact_largest_ocean,none,0,0.0,Pacific Ocean
+fact_largest_ocean,global_dir,51,2.0,The largest ocean on Earth is the Pacific Ocean.
+fact_largest_ocean,global_dir,55,2.0,The largest ocean on Earth is the Pacific Ocean.
+fact_largest_ocean,random101,51,2.0,The largest ocean on Earth is the Pacific Ocean.
+fact_author_hamlet,none,0,0.0,William Shakespeare
+fact_author_hamlet,global_dir,51,2.0,William Shakespeare
+fact_author_hamlet,global_dir,55,2.0,William Shakespeare
+fact_author_hamlet,random101,51,2.0,William Shakespeare
+fact_ice,none,0,0.0,ice
+fact_ice,global_dir,51,2.0,Ice
+fact_ice,global_dir,55,2.0,The answer is ice.
+fact_ice,random101,51,2.0,ice
+fact_opposite_hot,none,0,0.0,cold
+fact_opposite_hot,global_dir,51,2.0,cold
+fact_opposite_hot,global_dir,55,2.0,cold
+fact_opposite_hot,random101,51,2.0,cold
+fact_opposite_up,none,0,0.0,down
+fact_opposite_up,global_dir,51,2.0,down
+fact_opposite_up,global_dir,55,2.0,down
+fact_opposite_up,random101,51,2.0,down
+fact_baby_cat,none,0,0.0,A baby cat is called a kitten.
+fact_baby_cat,global_dir,51,2.0,A baby cat is called a kitten.
+fact_baby_cat,global_dir,55,2.0,A baby cat is called a kitten.
+fact_baby_cat,random101,51,2.0,kitten
+fact_bees,none,0,0.0,Answer: Bee
+fact_bees,global_dir,51,2.0,Answer: Bee
+fact_bees,global_dir,55,2.0,The insect that makes honey is the honey bee.
+fact_bees,random101,51,2.0,Answer: Bee
+math_add,none,0,0.0,2
+math_add,global_dir,51,2.0,2
+math_add,global_dir,55,2.0,2
+math_add,random101,51,2.0,2
+math_mul,none,0,0.0,4
+math_mul,global_dir,51,2.0,4
+math_mul,global_dir,55,2.0,4
+math_mul,random101,51,2.0,4
+math_sub,none,0,0.0,6
+math_sub,global_dir,51,2.0,6
+math_sub,global_dir,55,2.0,6
+math_sub,random101,51,2.0,6
+math_div,none,0,0.0,5
+math_div,global_dir,51,2.0,5
+math_div,global_dir,55,2.0,5
+math_div,random101,51,2.0,5
+math_sq,none,0,0.0,81
+math_sq,global_dir,51,2.0,81
+math_sq,global_dir,55,2.0,81
+math_sq,random101,51,2.0,9 squared is 81.
+seq_letters,none,0,0.0,D
+seq_letters,global_dir,51,2.0,D
+seq_letters,global_dir,55,2.0,D
+seq_letters,random101,51,2.0,D
+seq_count,none,0,0.0,0
+seq_count,global_dir,51,2.0,0
+seq_count,global_dir,55,2.0,0
+seq_count,random101,51,2.0,0
+say_late,none,0,0.0,Better late than never
+say_late,global_dir,51,2.0,Better late than never
+say_late,global_dir,55,2.0,Better late than never
+say_late,random101,51,2.0,Better late than never
+say_eggs,none,0,0.0,basket
+say_eggs,global_dir,51,2.0,basket
+say_eggs,global_dir,55,2.0,basket
+say_eggs,random101,51,2.0,basket
+say_bird,none,0,0.0,The early bird catches the worm.
+say_bird,global_dir,51,2.0,worm
+say_bird,global_dir,55,2.0,The early bird catches the worm.
+say_bird,random101,51,2.0,worm
+say_rome,none,0,0.0,day
+say_rome,global_dir,51,2.0,day
+say_rome,global_dir,55,2.0,day
+say_rome,random101,51,2.0,day
+say_apple,none,0,0.0,An apple a day keeps the doctor away.
+say_apple,global_dir,51,2.0,doctor away
+say_apple,global_dir,55,2.0,An apple a day keeps the doctor away.
+say_apple,random101,51,2.0,An apple a day keeps the doctor away.
+say_cat,none,0,0.0,cat
+say_cat,global_dir,51,2.0,cat
+say_cat,global_dir,55,2.0,cat
+say_cat,random101,51,2.0,cat
+instr_word,none,0,0.0,Cow
+instr_word,global_dir,51,2.0,Cow
+instr_word,global_dir,55,2.0,Cow
+instr_word,random101,51,2.0,Cow
+instr_number,none,0,0.0,2
+instr_number,global_dir,51,2.0,2
+instr_number,global_dir,55,2.0,2
+instr_number,random101,51,2.0,2
