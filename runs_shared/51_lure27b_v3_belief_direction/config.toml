@@ -1,0 +1,51 @@
+# Belief tracking, properly: the run-50b result (a direction from the other belief
+# items fixes belief traps, the memorised-phrase direction does not) on the v5 + v6
+# belief items that pass the screen.
+#
+#   loo_dir       mean (ON - OFF) over every other belief item (leave-one-out)
+#   external_dir  run 49's memorised-phrase direction
+# Controls check whether the belief direction is "use what the character knows"
+# (controls stay right) or just "answer the new place" (controls break).
+# Transfer applies the all-item belief direction to the memorised-phrase set and to
+# Hagendorff CRT: does a belief direction break other kinds of item?
+[run]
+name = "51_lure27b_v3_belief_direction"
+job = "thinking_direction"
+
+[model]
+profile = "27b"
+dtype = "auto"
+device_map = "auto"
+sae_device = "auto"
+sae_dtype = "auto"
+
+[data]
+dataset = "kanghun_lure27b_v3"
+limit_per_family = 0
+train_frac = 0.6
+split_seed = 1
+instruction = true
+
+[thinking]
+traces = "runs_shared/06_kanghun_traps_v6_27b/lure27b_v3_traces.json"
+
+[loo]
+layers = [43, 47, 51, 55]
+alphas = [1.0, 1.5, 2.0, 3.0]
+random_seeds = [101, 102, 103]
+random_alpha = 2.0
+min_gap = 0.5
+family_scope = false
+external_directions = "runs_shared/49_lure27b_thinking_direction/global_directions.pt"
+external_alphas = [2.0, 3.0]
+
+[sanity]
+generate_tokens = 20
+
+[transfer]
+arms = [[47, 2.0], [51, 2.0]]
+random_seeds = [101]
+datasets = ["kanghun_lure27b_v1", "hagendorff_crt"]
+
+[colab]
+gpu = "G4"
