@@ -4,7 +4,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.jobs.thinking_direction import RowLog, _truthy, count_table, leave_one_out_means
+from experiments.jobs.thinking_direction import (
+    RowLog,
+    _truthy,
+    count_table,
+    leave_one_out_means,
+    split_shared_prefix,
+)
 
 
 class LeaveOneOutTests(unittest.TestCase):
@@ -34,6 +40,29 @@ class CountTableTests(unittest.TestCase):
         self.assertEqual(by_arm["d"]["correct"], 2)
         self.assertEqual(by_arm["d"]["lure_to_correct"], 1)  # z was already right
         self.assertEqual(by_arm["d"]["correct_to_lure"], 1)
+
+
+class SharedPrefixTests(unittest.TestCase):
+    def test_common_opening_moves_into_context(self) -> None:
+        # "the blue box" vs "the red box"
+        ctx, cor, lur = split_shared_prefix([1, 2], [7, 10, 12], [7, 11, 12])
+        self.assertEqual(ctx, [1, 2, 7])
+        self.assertEqual(cor, [10, 12])
+        self.assertEqual(lur, [11, 12])
+
+    def test_digits_split_late(self) -> None:
+        # "2018" vs "2016" tokenised digit by digit
+        ctx, cor, lur = split_shared_prefix([0], [2, 0, 1, 8], [2, 0, 1, 6])
+        self.assertEqual(ctx, [0, 2, 0, 1])
+        self.assertEqual((cor, lur), ([8], [6]))
+
+    def test_no_shared_opening_is_unchanged(self) -> None:
+        self.assertEqual(split_shared_prefix([5], [1], [2]), ([5], [1], [2]))
+
+    def test_one_answer_is_a_prefix_keeps_a_token_each(self) -> None:
+        ctx, cor, lur = split_shared_prefix([5], [1, 2], [1, 2, 3])
+        self.assertEqual(ctx, [5, 1])
+        self.assertEqual((cor, lur), ([2], [2, 3]))
 
 
 class TruthyTests(unittest.TestCase):

@@ -122,6 +122,25 @@ def leave_one_out_means(diffs: Mapping[str, Any], *, include: Iterable[str]) -> 
     return out
 
 
+def split_shared_prefix(
+    ctx: Sequence[int], correct: Sequence[int], lure: Sequence[int]
+) -> tuple[list[int], list[int], list[int]]:
+    """Move the answers' common opening tokens into the context.
+
+    "the blue box" vs "the red box" (or "2018" vs "2016", digit by digit) first differ
+    a few tokens in. An edit at the last context token then sits *before* the choice
+    is made, and the margin is decided at a position the edit never touched. Putting
+    the shared opening into the context makes the last context token the decision
+    point, for the capture, the edit and the forced choice alike.
+    """
+
+    shared = 0
+    while shared < min(len(correct), len(lure)) - 1 and correct[shared] == lure[shared]:
+        shared += 1
+    prefix = list(correct[:shared])
+    return list(ctx) + prefix, list(correct[shared:]), list(lure[shared:])
+
+
 def _truthy(value: Any) -> bool:
     return str(value).strip().lower() not in {"0", "false", "no", ""}
 
@@ -306,26 +325,32 @@ def run(config_path: Path, output_root: Path) -> Path:
     # ---------------------------------------------- capture ON / OFF (18 items)
     items: dict[str, dict[str, Any]] = {}
     for case in cases:
-        off_ids = runner.prompt_ids(case.prompt, thinking=False)
-        tail = tail_after_close(off_ids, runner.close_ids)
+        off_prompt = runner.prompt_ids(case.prompt, thinking=False)
+        tail = tail_after_close(off_prompt, runner.close_ids)
         trace = traces.get(case.case_id)
+        off_ids, cor, lur = split_shared_prefix(
+            off_prompt, runner.answer_ids(case.correct_answer), runner.answer_ids(case.lure_answer)
+        )
+        shared = off_ids[len(off_prompt) :]
         item: dict[str, Any] = {
             "case": case,
             "off_ids": off_ids,
-            "cor": runner.answer_ids(case.correct_answer),
-            "lur": runner.answer_ids(case.lure_answer),
+            "cor": cor,
+            "lur": lur,
+            "shared_prefix_tokens": len(shared),
         }
         item["off_cap"] = runner.capture(off_ids, all_layers, 1)
         item["off_margin"] = runner.margin(off_ids, item["cor"], item["lur"])
         if trace is not None and tail is not None:
             on_ids, completed = runner.on_context(case.prompt, trace["raw_text"], tail)
+            on_ids = on_ids + shared
             # Screen traces close a budget-capped thought by force; their own flag says so.
             completed = completed and _truthy(trace.get("thinking_completed", True))
             item["on_cap"] = runner.capture(on_ids, all_layers, 1)
             item["on_margin"] = runner.margin(on_ids, item["cor"], item["lur"])
             item["on_completed"] = completed
         ctl = _as_control(case)
-        item["ctl"] = (
+        item["ctl"] = split_shared_prefix(
             runner.prompt_ids(ctl.prompt, thinking=False),
             runner.answer_ids(ctl.correct_answer),
             runner.answer_ids(ctl.lure_answer),
@@ -442,8 +467,11 @@ def run(config_path: Path, output_root: Path) -> Path:
                 )
             ]
         )[0]
-        ctx = runner.prompt_ids(case.prompt, thinking=False)
-        cor, lur = runner.answer_ids(correct), runner.answer_ids(lure)
+        ctx, cor, lur = split_shared_prefix(
+            runner.prompt_ids(case.prompt, thinking=False),
+            runner.answer_ids(correct),
+            runner.answer_ids(lure),
+        )
         for arm, layer, alpha, edit in sanity_arms:
             hooks = [] if edit is None else answer_slot_hooks(layer, edit, ctx)
             evaluate(
@@ -494,8 +522,11 @@ def run(config_path: Path, output_root: Path) -> Path:
                 pairs.append(("control", _as_control(case)))
             for kind, c in pairs:
                 try:
-                    ctx = runner.prompt_ids(c.prompt, thinking=False)
-                    cor, lur = runner.answer_ids(c.correct_answer), runner.answer_ids(c.lure_answer)
+                    ctx, cor, lur = split_shared_prefix(
+                        runner.prompt_ids(c.prompt, thinking=False),
+                        runner.answer_ids(c.correct_answer),
+                        runner.answer_ids(c.lure_answer),
+                    )
                     if not cor or not lur or cor == lur:
                         continue
                     for arm, layer, alpha, edit in t_arms:
