@@ -1,0 +1,9 @@
+dataset,kind,arm,layer,alpha,n,correct,lure_to_correct,correct_to_lure,mean_gap_closure
+kanghun_lure27b_v1,control,global_dir,47,2.0,18,18,0,0,
+kanghun_lure27b_v1,control,global_dir,51,2.0,18,18,0,0,
+kanghun_lure27b_v1,control,none,0,0.0,18,18,0,0,
+kanghun_lure27b_v1,control,random101,47,2.0,18,18,0,0,
+kanghun_lure27b_v1,trap,global_dir,47,2.0,18,3,2,0,
+kanghun_lure27b_v1,trap,global_dir,51,2.0,18,3,2,0,
+kanghun_lure27b_v1,trap,none,0,0.0,18,1,0,0,
+kanghun_lure27b_v1,trap,random101,47,2.0,18,3,2,0,
