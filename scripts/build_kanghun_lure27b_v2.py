@@ -120,55 +120,98 @@ def family_table(
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument(
-        "--screen", type=Path, default=ROOT / "runs_shared/05_kanghun_traps_v5_27b/responses.json"
+        "--screen",
+        type=Path,
+        action="append",
+        help="screen responses.json; repeat together with --source for several screens",
     )
-    parser.add_argument("--source", default=SOURCE_ID, help="screened dataset id")
+    parser.add_argument("--source", action="append", help="screened dataset id, one per --screen")
+    parser.add_argument("--dataset-id", default=DATASET_ID, help="id of the dataset to write")
+    parser.add_argument("--families", nargs="*", default=None, help="keep only these families")
+    parser.add_argument("--traces-out", type=Path, default=None, help="where the traces go")
     parser.add_argument("--out-dir", type=Path, default=DATA, help="where the dataset goes")
     args = parser.parse_args()
-    source_id = args.source
+    screens = args.screen or [ROOT / "runs_shared/05_kanghun_traps_v5_27b/responses.json"]
+    sources = args.source or [SOURCE_ID]
+    if len(screens) != len(sources):
+        raise SystemExit("give one --source per --screen")
+    dataset_id = args.dataset_id
+    families = set(args.families) if args.families else None
 
-    source = json.loads((DATA / f"{source_id}.json").read_text(encoding="utf-8"))
-    rows = _rows(args.screen)
-    labels = labels_by_pair(rows, source_id)
+    cases: list[dict[str, Any]] = []
+    traces: dict[str, dict[str, Any]] = {}
+    for screen, source_id in zip(screens, sources, strict=True):
+        source = json.loads((DATA / f"{source_id}.json").read_text(encoding="utf-8"))
+        rows = _rows(screen)
+        labels = labels_by_pair(rows, source_id)
 
-    table = family_table(source["cases"], labels)
-    table_path = args.screen.parent / "family_screen.csv"
-    with table_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(table[0]))
-        writer.writeheader()
-        writer.writerows(table)
-    print(f"{'family':22s} pairs  lure_off  lure_on  pass")
-    for row in table:
-        print(
-            f"{row['family']:22s} {row['pairs']:>5}  {row['trap_lure_rate_off']!s:>8}  "
-            f"{row['trap_lure_rate_on']!s:>7}  {row['pass']:>4}"
-        )
+        table = family_table(source["cases"], labels)
+        with (screen.parent / "family_screen.csv").open("w", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(fh, fieldnames=list(table[0]))
+            writer.writeheader()
+            writer.writerows(table)
+        print(f"== {source_id}")
+        print(f"{'family':22s} pairs  lure_off  lure_on  pass")
+        for row in table:
+            print(
+                f"{row['family']:22s} {row['pairs']:>5}  {row['trap_lure_rate_off']!s:>8}  "
+                f"{row['trap_lure_rate_on']!s:>7}  {row['pass']:>4}"
+            )
 
-    selected = [c for c in source["cases"] if passes(labels.get(c["pair_id"], {}))]
-    cases = []
-    for row in selected:
-        case = dict(row)
-        case["case_id"] = f"{DATASET_ID}_{row['pair_id']}"
-        case["note"] = f"[{source_id}:{row['family']}] {row['note']}"
-        cases.append(case)
+        selected = [
+            c
+            for c in source["cases"]
+            if passes(labels.get(c["pair_id"], {}))
+            and (families is None or c["family"] in families)
+        ]
+        for row in selected:
+            case = dict(row)
+            case["case_id"] = f"{dataset_id}_{row['pair_id']}"
+            if any(c["case_id"] == case["case_id"] for c in cases):
+                raise SystemExit(f"pair id {row['pair_id']} appears in two screens")
+            case["note"] = f"[{source_id}:{row['family']}] {row['note']}"
+            cases.append(case)
+
+        # Thinking-on traces for the selected items, first seed that has one.
+        wanted = {c["pair_id"] for c in selected}
+        prefix = f"{source_id}_"
+        for row in sorted(rows, key=lambda r: str(r.get("seed", ""))):
+            cid = str(row["case_id"])
+            if not cid.startswith(prefix) or cid.endswith("__control"):
+                continue
+            pair = cid[len(prefix) :]
+            new_id = f"{dataset_id}_{pair}"
+            if pair not in wanted or str(row.get("mode")) != "thinking" or new_id in traces:
+                continue
+            traces[new_id] = {
+                "case_id": new_id,
+                "family": row.get("family", ""),
+                "thinking": True,
+                "raw_text": row.get("raw_text", ""),
+                "answer_label": row.get("answer_label", ""),
+                "thinking_completed": _truthy(row.get("thinking_completed", True)),
+                "seed": row.get("seed", ""),
+                "source": source_id,
+            }
+
     counts: dict[str, int] = defaultdict(int)
     for case in cases:
         counts[case["family"]] += 1
     payload = {
-        "dataset_id": DATASET_ID,
+        "dataset_id": dataset_id,
         "schema_version": 2,
-        "title": "27B lure set v2 (new families, screened)",
+        "title": f"27B lure set ({dataset_id}, screened)",
         "description": (
-            "kanghun_traps_v5 pairs that Qwen3.5-27B answered with the lure when thinking was "
-            "off and correctly when it was on, with the matched control correct both ways, on "
-            "every screened seed. Copied verbatim; family kept."
+            f"Pairs from {', '.join(sources)} that Qwen3.5-27B answered with the lure when "
+            "thinking was off and correctly when it was on, with the matched control correct "
+            "both ways, on every screened seed. Copied verbatim; family kept."
         ),
         "task_kind": "reasoning_lure",
         "scoring": "logprob_margin",
         "source": {
             "authors": "Lee Kanghun (MindScopeX), LLM-assisted",
             "year": 2026,
-            "title": "27B lure set v2",
+            "title": dataset_id,
             "venue": "Repository-authored set, screened on Qwen3.5-27B",
             "doi": "",
             "project_url": "",
@@ -179,32 +222,13 @@ def main() -> None:
         "cases": cases,
     }
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    (args.out_dir / f"{DATASET_ID}.json").write_text(
+    (args.out_dir / f"{dataset_id}.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    print(f"\n{DATASET_ID}: {len(cases)} items {dict(counts)}")
+    print(f"\n{dataset_id}: {len(cases)} items {dict(counts)}")
 
-    # Thinking-on traces for the selected items, first seed that has one.
-    wanted = {c["pair_id"] for c in selected}
-    prefix = f"{source_id}_"
-    traces: dict[str, dict[str, Any]] = {}
-    for row in sorted(rows, key=lambda r: str(r.get("seed", ""))):
-        cid = str(row["case_id"])
-        if not cid.startswith(prefix) or cid.endswith("__control"):
-            continue
-        pair = cid[len(prefix) :]
-        if pair not in wanted or str(row.get("mode")) != "thinking" or pair in traces:
-            continue
-        traces[pair] = {
-            "case_id": f"{DATASET_ID}_{pair}",
-            "family": row.get("family", ""),
-            "thinking": True,
-            "raw_text": row.get("raw_text", ""),
-            "answer_label": row.get("answer_label", ""),
-            "thinking_completed": _truthy(row.get("thinking_completed", True)),
-            "seed": row.get("seed", ""),
-        }
-    traces_path = args.screen.parent / "lure27b_v2_traces.json"
+    short = dataset_id.removeprefix("kanghun_")
+    traces_path = args.traces_out or screens[-1].parent / f"{short}_traces.json"
     traces_path.write_text(
         json.dumps(list(traces.values()), indent=2, ensure_ascii=False), encoding="utf-8"
     )
