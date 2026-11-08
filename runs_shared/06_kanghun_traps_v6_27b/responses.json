@@ -1,0 +1,32 @@
+[
+  {
+    "model_id": "Qwen/Qwen3.5-27B",
+    "case_id": "kanghun_traps_v6_pen_watched",
+    "family": "belief_tracking",
+    "enable_thinking": false,
+    "prompt": "Ravi puts his pen in the drawer and steps out into the hallway. Through the open door he watches Mei move the pen to the shelf. Ravi walks back in. Where will Ravi look for his pen first?\nAnswer:",
+    "correct_answer": "the shelf",
+    "lure_answer": "the drawer",
+    "raw_text": "the drawer",
+    "thinking": "",
+    "answer": "the drawer",
+    "answer_label": "lure",
+    "input_tokens": 129,
+    "output_tokens": 2,
+    "elapsed_seconds": 0.5057631390000097,
+    "seed": 42,
+    "hit_max_tokens": false,
+    "generation_attempts": 1,
+    "retry_reasons": [],
+    "attempt_history": [],
+    "thinking_completed": null,
+    "mode": "non_thinking",
+    "has_thinking_block": false,
+    "reasoning_detected": false,
+    "thinking_protocol_ok": true,
+    "thinking_protocol_issue": null,
+    "final_answer_format_ok": true,
+    "final_answer_format_issue": null,
+    "evaluation_label": "lure"
+  }
+]

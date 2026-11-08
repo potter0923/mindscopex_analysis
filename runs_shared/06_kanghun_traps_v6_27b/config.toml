@@ -1,0 +1,32 @@
+# v6: 24 more belief-tracking pairs (the family the v5 screen found), on Qwen3.5-27B.
+# Same protocol as 01_-04_ (reasoning OFF/ON, forced correct-vs-lure, controls on).
+# One seed. The thinking traces are reused as the thinking-on side of the direction;
+# the job caps 27B at 2048 thinking tokens, so some traces will be cut off and are
+# flagged (not used to build the direction).
+[run]
+name = "06_kanghun_traps_v6_27b"
+job = "crt_text_responses"
+
+[dataset]
+id = "kanghun_traps_v6"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false, true]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
