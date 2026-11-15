@@ -28,5 +28,18 @@
   "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
   "git_commit": "9a397151d7bb1661c60ab19cfa8831dab5adbdaa",
   "git_status": "M runs_shared/07b_kanghun_traps_v7_27b_on/manifest.json\n M runs_shared/07b_kanghun_traps_v7_27b_on/responses.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/family_summary.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/figures/\n?? runs_shared/07b_kanghun_traps_v7_27b_on/lure27b_memo_traces.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/summary.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/summary.md\n?? runs_shared/07b_kanghun_traps_v7_27b_on/templates.csv\n?? runs_shared/08b_kanghun_traps_v8_27b_on/\n?? src/mindscopex_analysis/data/kanghun_lure27b_memo.json\n?? src/mindscopex_analysis/data/kanghun_traps_v7s2.json\n?? src/mindscopex_analysis/data/kanghun_traps_v8s2.json",
-  "resumed_with": 0
+  "resumed_with": 0,
+  "finished_at": "2026-11-15T14:46:28+00:00",
+  "elapsed_seconds": 12838.558,
+  "n_responses": 160,
+  "artifacts": {
+    "responses": "runs_shared/08b_kanghun_traps_v8_27b_on/responses.json",
+    "summary_markdown": "runs_shared/08b_kanghun_traps_v8_27b_on/summary.md",
+    "summary_json": "runs_shared/08b_kanghun_traps_v8_27b_on/summary.json",
+    "family_summary_json": "runs_shared/08b_kanghun_traps_v8_27b_on/family_summary.json",
+    "figures": [
+      "runs_shared/08b_kanghun_traps_v8_27b_on/figures/headline_accuracy.png",
+      "runs_shared/08b_kanghun_traps_v8_27b_on/figures/family_lure_rate.png"
+    ]
+  }
 }
