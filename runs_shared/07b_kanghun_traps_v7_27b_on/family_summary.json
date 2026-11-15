@@ -1,0 +1,25 @@
+[
+  {
+    "model": "Qwen3.5-27B",
+    "mode": "thinking",
+    "family": "memo_override",
+    "total": 59,
+    "correct": 39,
+    "incorrect": 20,
+    "lure": 20,
+    "hallucination": 0,
+    "both": 0,
+    "other": 0,
+    "format_failures": 0,
+    "protocol_failures": 0,
+    "retried_responses": 0,
+    "retry_attempts": 0,
+    "accuracy": 0.6610169491525424,
+    "lure_rate": 0.3389830508474576,
+    "hallucination_rate": 0.0,
+    "accuracy_ci_low": 0.5337223255448901,
+    "accuracy_ci_high": 0.7686251640161651,
+    "lure_rate_ci_low": 0.23137483598383493,
+    "lure_rate_ci_high": 0.4662776744551099
+  }
+]

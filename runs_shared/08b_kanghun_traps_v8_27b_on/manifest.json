@@ -1,0 +1,32 @@
+{
+  "run_name": "08b_kanghun_traps_v8_27b_on",
+  "job": "crt_text_responses",
+  "started_at": "2026-11-15T11:12:29+00:00",
+  "config_path": "experiments/configs/08b_kanghun_traps_v8_27b_on.toml",
+  "output_dir": "runs_shared/08b_kanghun_traps_v8_27b_on",
+  "dataset": "kanghun_traps_v8s2",
+  "dataset_preset": "id:kanghun_traps_v8s2",
+  "dataset_reference": "kanghun_traps_v8s2",
+  "n_cases": 160,
+  "model_ids": [
+    "Qwen/Qwen3.5-27B"
+  ],
+  "seeds": [
+    42
+  ],
+  "thinking_modes": [
+    true
+  ],
+  "generation_protocol": "qwen_native",
+  "output_mode": "binary_choice",
+  "max_new_tokens": 2048,
+  "max_retries": 2,
+  "dtype": "bfloat16",
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "cuda_available": true,
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "git_commit": "9a397151d7bb1661c60ab19cfa8831dab5adbdaa",
+  "git_status": "M runs_shared/07b_kanghun_traps_v7_27b_on/manifest.json\n M runs_shared/07b_kanghun_traps_v7_27b_on/responses.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/family_summary.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/figures/\n?? runs_shared/07b_kanghun_traps_v7_27b_on/lure27b_memo_traces.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/summary.json\n?? runs_shared/07b_kanghun_traps_v7_27b_on/summary.md\n?? runs_shared/07b_kanghun_traps_v7_27b_on/templates.csv\n?? runs_shared/08b_kanghun_traps_v8_27b_on/\n?? src/mindscopex_analysis/data/kanghun_lure27b_memo.json\n?? src/mindscopex_analysis/data/kanghun_traps_v7s2.json\n?? src/mindscopex_analysis/data/kanghun_traps_v8s2.json",
+  "resumed_with": 0
+}
