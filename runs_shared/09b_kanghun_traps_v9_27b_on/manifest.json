@@ -1,0 +1,32 @@
+{
+  "run_name": "09b_kanghun_traps_v9_27b_on",
+  "job": "crt_text_responses",
+  "started_at": "2026-11-15T14:47:56+00:00",
+  "config_path": "experiments/configs/09b_kanghun_traps_v9_27b_on.toml",
+  "output_dir": "runs_shared/09b_kanghun_traps_v9_27b_on",
+  "dataset": "kanghun_traps_v9s2",
+  "dataset_preset": "id:kanghun_traps_v9s2",
+  "dataset_reference": "kanghun_traps_v9s2",
+  "n_cases": 39,
+  "model_ids": [
+    "Qwen/Qwen3.5-27B"
+  ],
+  "seeds": [
+    42
+  ],
+  "thinking_modes": [
+    true
+  ],
+  "generation_protocol": "qwen_native",
+  "output_mode": "binary_choice",
+  "max_new_tokens": 2048,
+  "max_retries": 2,
+  "dtype": "bfloat16",
+  "python": "3.13.16 (main, Oct  1 2026, 15:40:24) [GCC 13.3.0]",
+  "platform": "Linux-6.6.159+-x86_64-with-glibc2.39",
+  "cuda_available": true,
+  "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "git_commit": "1bacd2d847abf53253dfd36a856f1d46d5ebe73d",
+  "git_status": "?? runs_shared/09_kanghun_traps_v9_27b_off/\n?? runs_shared/09b_kanghun_traps_v9_27b_on/\n?? src/mindscopex_analysis/data/kanghun_traps_v9s2.json",
+  "resumed_with": 0
+}
