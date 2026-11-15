@@ -1,0 +1,28 @@
+# Stage 1 of the scaled belief-tracking screen: thinking OFF only, traps + controls.
+[run]
+name = "08_kanghun_traps_v8_27b_off"
+job = "crt_text_responses"
+
+[dataset]
+id = "kanghun_traps_v8"
+include_controls = true
+
+[model]
+ids = ["Qwen/Qwen3.5-27B"]
+dtype = "auto"
+device_map = "auto"
+
+[generation]
+protocol = "qwen_native"
+seeds = [42]
+thinking_modes = [false]
+output_mode = "binary_choice"
+max_new_tokens = 2048
+
+[colab]
+gpu = "G4"
+
+[remote]
+source = "archive"
+repo_dir = "/content/mindscopex_analysis"
+output_root = "/content/mindscopex_artifacts"
